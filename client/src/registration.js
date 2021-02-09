@@ -1,5 +1,6 @@
 import React from "react";
-import axios from "axios";
+import axios from "./axios";
+import { Link } from "react-router-dom";
 /*
 show input field
 keep track of variables and present log-in button with aios
@@ -111,9 +112,10 @@ export default class Registration extends React.Component {
                     <div className="error">
                         {this.state.error && <p>{this.state.error}</p>}
                     </div>
-                    <div>
-                        Already a user? Log In <a href="#">here</a>
-                    </div>
+                    <p>
+                        Already a user? Click here to{" "}
+                        <Link to="/login">log in</Link>
+                    </p>
                 </div>
             </div>
         );

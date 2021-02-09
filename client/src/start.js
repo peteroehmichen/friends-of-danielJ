@@ -2,7 +2,7 @@
 
 import ReactDOM from "react-dom";
 import Welcome from "./welcome";
-import SignedIn from "./logo";
+import Logo from "./logo";
 
 let elem;
 if (location.pathname === "/welcome") {
