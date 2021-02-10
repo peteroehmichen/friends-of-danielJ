@@ -1,37 +1,9 @@
+const path = require("path");
 const express = require("express");
 const app = express();
-const compression = require("compression");
-const path = require("path");
-const cookieSession = require("cookie-session");
-const csurf = require("csurf");
-
-const db = require("./db");
 const { hash, compare } = require("./authenticate");
-const { sendEMail, uploader, uploadToAWS } = require("./aws");
-
-let cookie_secret = process.env.cookie_secret
-    ? process.env.cookie_secret
-    : require("../secrets.json").secretOfSession;
-
-app.use(
-    cookieSession({
-        secret: cookie_secret,
-        maxAge: 1000 * 60 * 60 * 24 * 7,
-    })
-);
-
-app.use(csurf());
-
-app.use((req, res, next) => {
-    res.cookie("myCookieSecret", req.csrfToken());
-    next();
-});
-
-app.use(express.json());
-
-app.use(compression());
-
-app.use(express.static(path.join(__dirname, "..", "client", "public")));
+const { sendEMail } = require("./mailing");
+const db = require("./db");
 
 app.get("/welcome", (req, res) => {
     if (req.session.userId) {
@@ -97,16 +69,7 @@ app.post("/password/reset/start", (req, res) => {
                 sendEMail(result.rows[0].email).then((code) => {
                     db.addResetCode(req.body.email, code)
                         .then((result) => {
-                            console.log(result.rows[0].created_at);
-                            let oldDate = new Date(result.rows[0].created_at);
-                            console.log(oldDate);
-
-                            let newDate = new Date(
-                                oldDate.getTime() + 10 * 60000
-                            );
-                            console.log("new:", newDate);
-                            // include the time operation here so that I sent the time of expected answer
-                            res.json({ codeValidUntil: newDate });
+                            res.json(result);
                         })
                         .catch((err) => {
                             console.log("Error in Writing Code to DB:", err);
@@ -158,54 +121,10 @@ app.post("/password/reset/code", (req, res) => {
         });
 });
 
-app.get("/user", (req, res) => {
-    return db
-        .getUserById(req.session.userId)
-        .then((result) => {
-            if (result.rowCount > 0) {
-                return res.json({
-                    first: result.rows[0].first,
-                    last: result.rows[0].last,
-                    url: result.rows[0].profile_pic_url,
-                });
-            } else {
-                res.json({ error: "user could not be found" });
-            }
-        })
-        .catch((err) => res.json({ error: "DB Error" }));
-});
-
-app.post("/profile-pic", uploader.single("file"), uploadToAWS, (req, res) => {
-    // console.log("PostRoute body:", req.body.url);
-    // console.log("PostRoute file:", req.file);
-    db.addProfilePic(req.body.url, req.session.userId)
-        .then((result) => {
-            // console.log("DB-Result:", result);
-            if (result.rowCount > 0) {
-                res.json({ url: req.body.url });
-            } else {
-                res.json({ error: "DB rejected new picture" });
-            }
-        })
-        .catch((err) => res.json({ error: "couldn't write to DB:", err }));
-
-    // res.json({ error: "temporary response" });
-});
-
 app.get("/logout", (req, res) => {
     req.session = null;
     console.log("All user cookies deleted");
     res.redirect("/welcome");
 });
 
-app.get("*", function (req, res) {
-    if (!req.session.userId) {
-        res.redirect("/welcome");
-    } else {
-        res.sendFile(path.join(__dirname, "..", "client", "index.html"));
-    }
-});
-
-app.listen(process.env.PORT || 3001, function () {
-    console.log("I'm listening.");
-});
+module.exports.app;

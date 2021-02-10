@@ -1,12 +1,6 @@
 import React from "react";
 import axios from "./axios";
 import { Link } from "react-router-dom";
-/*
-show input field
-keep track of variables and present log-in button with aios
-render error
-
-*/
 
 export default class Registration extends React.Component {
     constructor(props) {
@@ -17,7 +11,6 @@ export default class Registration extends React.Component {
             last: "",
             email: "",
             password: "",
-            // filledFields: {},
         };
     }
 
@@ -33,7 +26,7 @@ export default class Registration extends React.Component {
         if (
             this.state.first == "" ||
             this.state.last == "" ||
-            this.state.email == "" ||
+            !this.state.email.includes("@") ||
             this.state.password == ""
         ) {
             // console.log("Error");
@@ -41,11 +34,10 @@ export default class Registration extends React.Component {
                 error: "please fill out all the fields",
             });
         } else {
-            // console.log("Sending:");
             axios
                 .post("/registration", this.state)
                 .then((res) => {
-                    console.log("answer from axios.post:", res.data);
+                    // console.log("answer from axios.post:", res.data);
                     if (res.data.id) {
                         this.setState({
                             error: false,
@@ -58,6 +50,8 @@ export default class Registration extends React.Component {
                         } else if (res.data.error == "23502") {
                             msg =
                                 "please check input quality (i.e. E-Mail with @ and no empty fields)";
+                        } else {
+                            msg = "unknown Error while Registration";
                         }
 
                         this.setState({
@@ -66,18 +60,15 @@ export default class Registration extends React.Component {
                     }
                 })
                 .catch((err) => {
-                    console.log("caught in catch of axios-post:", err);
+                    // console.log("caught in catch of axios-post:", err);
                     this.setState({
                         error: "Unkown Error during contact to Database",
                     });
                 });
         }
-        // if (this.state.first == "a") {
-        // }
     }
 
     render() {
-        // form causes a reload of the page - prevent default?
         return (
             <div className="register">
                 <div className="registerTitle">

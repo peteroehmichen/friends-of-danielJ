@@ -14,6 +14,13 @@ module.exports.addUser = function (first, last, email, hashedPW) {
     );
 };
 
+module.exports.addProfilePic = function (url, id) {
+    return sql.query(`UPDATE users SET profile_pic_url = $1 WHERE id = $2;`, [
+        url,
+        id,
+    ]);
+};
+
 module.exports.getAuthenticatedUser = function (email, password) {
     return this.getUserByEmail(email).then((result) => {
         // console.log("return from SQL:", result);
@@ -39,11 +46,15 @@ module.exports.getUserByEmail = function getUserByEmail(email) {
     return sql.query(`SELECT * FROM users WHERE email=$1`, [email]);
 };
 
+module.exports.getUserById = function getUserByEmail(id) {
+    return sql.query(`SELECT * FROM users WHERE id=$1`, [id]);
+};
+
 module.exports.addResetCode = function (email, code) {
-    return sql.query(`INSERT INTO codes (email, code) VALUES ($1, $2);`, [
-        email,
-        code,
-    ]);
+    return sql.query(
+        `INSERT INTO codes (email, code) VALUES ($1, $2) RETURNING created_at;`,
+        [email, code]
+    );
 };
 
 module.exports.updateUser = function (email, hashedPw) {

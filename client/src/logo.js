@@ -1,3 +1,14 @@
+// import React from "react";
+
 export default function Logo() {
-    return <h1>Welcome User</h1>;
+    return (
+        <div className="Logo">
+            <h1>The logo is here</h1>
+        </div>
+    );
 }
+
+/* 
+
+
+*/

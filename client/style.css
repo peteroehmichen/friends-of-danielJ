@@ -35,3 +35,14 @@ button {
     padding: 5px;
     font-size: 1em;
 }
+
+.profile-picture {
+    /* width: 250px;
+    height: 250px; */
+}
+
+.profile-picture img {
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+}
