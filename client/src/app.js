@@ -3,6 +3,8 @@ import Uploader from "./uploader";
 import Logo from "./logo";
 import ProfilePic from "./profilePic";
 import axios from "./axios";
+import Profile from "./profile";
+import BioEditor from "./bioEditor";
 
 // still need to handle error messages...
 
@@ -13,11 +15,13 @@ export default class App extends React.Component {
             first: "",
             last: "",
             email: "",
+            bio: "",
             profilePicUrl: "",
             activateUploadModal: false,
         };
         this.toggleUploadModal = this.toggleUploadModal.bind(this);
         this.setProfilePicUrl = this.setProfilePicUrl.bind(this);
+        this.setBio = this.setBio.bind(this);
     }
 
     componentDidMount() {
@@ -29,6 +33,7 @@ export default class App extends React.Component {
                 this.setState({
                     first: result.data.first,
                     last: result.data.last,
+                    bio: result.data.bio,
                     profilePicUrl: result.data.url || "default_user.svg",
                 });
             })
@@ -48,22 +53,38 @@ export default class App extends React.Component {
         this.setState({
             profilePicUrl: url,
         });
+        this.toggleUploadModal();
         //
+    }
+
+    setBio(bio) {
+        // console.log("Setting profile BIO:", bio);
+        this.setState({
+            bio: bio,
+        });
     }
 
     render() {
         return (
-            <div className="app-frame">
+            <div className="app-frame debug-black">
                 <Logo />
                 <ProfilePic
                     first={this.state.first}
-                    last={this.state.last}
                     profilePicUrl={this.state.profilePicUrl}
+                    size="small"
                     toggleUploadModal={this.toggleUploadModal}
                 />
                 {this.state.activateUploadModal && (
                     <Uploader setProfilePicUrl={this.setProfilePicUrl} />
                 )}
+                <Profile
+                    first={this.state.first}
+                    last={this.state.last}
+                    profilePicUrl={this.state.profilePicUrl}
+                    bio={this.state.bio}
+                    setBio={this.setBio}
+                    toggleUploadModal={this.toggleUploadModal}
+                />
             </div>
         );
     }

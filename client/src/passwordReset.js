@@ -10,6 +10,7 @@ export default class PasswordReset extends React.Component {
             email: "",
             password: "",
             code: "",
+            codeValidUntil: 0,
             error: false,
             step: 1,
         };

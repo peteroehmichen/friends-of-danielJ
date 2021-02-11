@@ -21,6 +21,10 @@ module.exports.addProfilePic = function (url, id) {
     ]);
 };
 
+module.exports.addBio = function (bio, id) {
+    return sql.query(`UPDATE users SET bio = $1 WHERE id = $2;`, [bio, id]);
+};
+
 module.exports.getAuthenticatedUser = function (email, password) {
     return this.getUserByEmail(email).then((result) => {
         // console.log("return from SQL:", result);
@@ -64,14 +68,16 @@ module.exports.updateUser = function (email, hashedPw) {
     ]);
 };
 
-module.exports.confirmCode = function (code, email) {
+module.exports.confirmCode = function (code, validity, email) {
+    // console.log("looking for codes younger than:", validity);
     return sql
         .query(
-            `SELECT code FROM codes WHERE CURRENT_TIMESTAMP - created_at < INTERVAL '10 minutes' AND email = $1 ORDER BY id DESC;`,
+            `SELECT code FROM codes WHERE CURRENT_TIMESTAMP - created_at < INTERVAL '${validity} minutes' AND email = $1 ORDER BY id DESC;`,
             [email]
         )
         .then((result) => {
             if (result.rowCount > 0) {
+                // console.log(result.rows[0].code);
                 return result.rows[0].code == code;
             } else {
                 return false;

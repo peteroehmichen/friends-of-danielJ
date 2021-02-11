@@ -20,7 +20,7 @@ body {
     align-items: center;
 }
 
-input {
+input[type="text"] {
     margin: 10px;
     background-color: transparent;
     border: 0;
@@ -28,21 +28,160 @@ input {
     font-size: 1em;
 }
 
+/* new stuff begin */
+
+#file {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+label {
+    width: 150px;
+    height: 40px;
+    overflow: hidden;
+    background-color: tomato;
+    display: flex;
+    flex-direction: row;
+    margin: 0 20px;
+    padding: 0 5px;
+    /* border-bottom: 3px solid orangered; */
+}
+
+label > img {
+    width: 40px;
+    height: 35px;
+}
+
+#file + label {
+    font-size: 1.1em;
+    font-family: Arial, Helvetica, sans-serif;
+
+    display: inline-block;
+    cursor: pointer;
+}
+
+#file + label * {
+    pointer-events: none;
+}
+
+/* new stuff end */
+
 button {
+    position: relative;
     background-color: tomato;
     font-weight: bold;
     border-radius: 5px;
     padding: 5px;
     font-size: 1em;
+    min-width: 80px;
+    min-height: 40px;
 }
 
 .profile-picture {
-    /* width: 250px;
-    height: 250px; */
+    object-fit: cover;
 }
 
-.profile-picture img {
+.profile-picture.small {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+}
+
+.profile-picture.large {
     width: 250px;
     height: 250px;
-    object-fit: cover;
+    border-radius: 15px;
+}
+
+.bio {
+    position: relative;
+}
+
+.lowTimer {
+    /* color: red; */
+    font-weight: bold;
+    animation: lowTimer;
+    animation-duration: 1s;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+}
+
+@keyframes lowTimer {
+    from {
+        color: transparent;
+    }
+    to {
+        color: red;
+    }
+}
+
+.spinner {
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* background-color: rgba(0, 0, 0, 0.3); */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.spinner img {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+    animation: rotate;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Debug classes */
+
+.debug-orange {
+    border: 3px solid orange;
+}
+
+.debug-blue {
+    border: 3px solid blue;
+}
+
+.debug-green {
+    border: 3px solid green;
+}
+
+.debug-black {
+    border: 3px solid black;
+}
+
+.debug-red {
+    border: 3px solid red;
+}
+
+.debug-yellow {
+    border: 3px solid yellow;
+}
+
+.debug-grey {
+    border: 3px solid grey;
+}
+
+.debug-brown {
+    border: 3px solid brown;
 }

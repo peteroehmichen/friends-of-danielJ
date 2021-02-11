@@ -1,5 +1,6 @@
 import axios from "./axios";
 import React from "react";
+import Spinner from "./spinner";
 
 // still need to block upload button when uploading
 
@@ -8,6 +9,7 @@ export default class Uploader extends React.Component {
         super(props);
         this.state = {
             file: "",
+            loading: false,
         };
         this.selectHandler = this.selectHandler.bind(this);
         this.uploadPicture = this.uploadPicture.bind(this);
@@ -34,33 +36,71 @@ export default class Uploader extends React.Component {
         // axios post with formdata, S3, SQL, receiving URL
         // this.props.setProfilePicUrl("test");
         // console.log("what to upload:", this.state);
-        const profilePicture = new FormData();
-        profilePicture.append("file", this.state.file);
-
-        axios
-            .post("/profile-pic", profilePicture)
-            .then((response) => {
-                // console.log("Upload Post received:", response);
-                this.props.setProfilePicUrl(response.data.url);
-            })
-            .catch((err) => {
-                console.log("error in Upload Post:", err);
+        if (this.state.file) {
+            this.setState({
+                loading: true,
             });
+
+            const profilePicture = new FormData();
+            profilePicture.append("file", this.state.file);
+
+            axios
+                .post("/profile-pic", profilePicture)
+                .then((response) => {
+                    // console.log("Upload Post received:", response);
+                    this.setState({
+                        loading: false,
+                    });
+                    this.props.setProfilePicUrl(response.data.url);
+                })
+                .catch((err) => {
+                    this.setState({
+                        loading: false,
+                    });
+                    console.log("error in Upload Post:", err);
+                });
+        } else {
+            console.log("no file selected!");
+        }
     }
 
     render() {
+        let button;
+        if (this.state.loading) {
+            button = (
+                <button disabled={true}>
+                    <Spinner />
+                </button>
+            );
+        } else {
+            button = (
+                <button
+                    onClick={() => {
+                        this.uploadPicture();
+                    }}
+                >
+                    Upload picture
+                </button>
+            );
+        }
+
         return (
-            <div className="modal">
+            <div className="modal debug-red">
                 <div className="upload-modal">
                     <h1>This is the upload functionality</h1>
-                    <input key={4} type="file" onChange={this.selectHandler} />
-                    <button
-                        onClick={() => {
-                            this.uploadPicture();
-                        }}
-                    >
-                        Upload picture
-                    </button>
+                    <input
+                        type="file"
+                        name="file"
+                        id="file"
+                        accept="image/*"
+                        onChange={this.selectHandler}
+                        key={4}
+                    />
+                    <label htmlFor="file">
+                        <img src="upload_white.svg" />
+                        <span>{this.state.filename}</span>
+                    </label>
+                    {button}
                 </div>
             </div>
         );

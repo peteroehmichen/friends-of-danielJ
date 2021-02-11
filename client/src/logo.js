@@ -2,7 +2,7 @@
 
 export default function Logo() {
     return (
-        <div className="Logo">
+        <div className="Logo debug-blue">
             <h1>The logo is here</h1>
         </div>
     );

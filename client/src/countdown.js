@@ -1,52 +1,55 @@
 import React from "react";
 
+// needs to receive a timestamp in miliseconds to countdown to.
 export default class Countdown extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            codeValidUntil: props.codeValidUntil,
             remainingSecs: "00",
-            remainingMins: "10",
+            remainingMins: "00",
         };
     }
 
-    // componentDidMount() {
-    //     this.setState({
-    //         endOfTime: Date.now() + 1000 * 60 * 10,
-    //     });
-    //     // this.analyseTime();
-    //     // this.timerId = setInterval(() => {
-    //     //     // this.tick();
-    //     // }, 1000);
-    // }
+    componentDidMount() {
+        this.timerId = setInterval(() => {
+            this.tick();
+        }, 1000);
+    }
 
-    // console.log("time:", this.state.codeValidUntil);
-    // let newDate = new Date(this.state.codeValidUntil);
-    // console.log(newDate);
-    // newDate = newDate.valueOf() + 1000 * 60 * 10;
-    // console.log(newDate);
-    // newDate = Math.floor(newDate / 1000);
-    // console.log(newDate);
-    // }
+    tick() {
+        const timeLeft = Math.floor(
+            (this.props.codeValidUntil - Date.now().valueOf()) / 1000
+        );
+        let minutesLeft = Math.floor(timeLeft / 60).toString();
+        let secondsLeft = Math.floor(timeLeft % 60).toString();
+        minutesLeft = minutesLeft.padStart(2, "0");
+        secondsLeft = secondsLeft.padStart(2, "0");
+        this.setState({
+            remainingSecs: secondsLeft,
+            remainingMins: minutesLeft,
+        });
+        if (minutesLeft == "00" && secondsLeft == "00") {
+            this.endCountdown();
+        }
+    }
 
-    // tick() {
-    //     const remaining = this.state.endOfTime - Date.now();
+    endCountdown() {
+        clearInterval(this.timerId);
+    }
 
-    //     this.setState({
-    //         remainingSecs: Math.floor(remaining / 1000),
-    //         remainingMins: Math.floor(remaining / (1000 * 60),
-
-    //         // remainingSecs: Math.floor(
-    //         //     (this.state.endOfTime - Date.now()) / 1000
-    //         // ),
-    //     });
-    // }
-
-    // componentWillUnmount() {
-    //     clearInterval(this.timerId);
-    // }
+    componentWillUnmount() {
+        this.endCountdown();
+    }
 
     render() {
-        return <span>{this.state.codeValidUntil}</span>;
+        return (
+            <span
+                className={
+                    (this.state.remainingMins == "00" && "lowTimer") || ""
+                }
+            >
+                {this.state.remainingMins + ":" + this.state.remainingSecs}
+            </span>
+        );
     }
 }

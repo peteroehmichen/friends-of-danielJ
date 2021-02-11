@@ -4,6 +4,7 @@ const compression = require("compression");
 const path = require("path");
 const cookieSession = require("cookie-session");
 const csurf = require("csurf");
+const { CODE_VALIDITY_IN_MINUTES } = require("../config.json");
 
 const db = require("./db");
 const { hash, compare } = require("./authenticate");
@@ -97,16 +98,22 @@ app.post("/password/reset/start", (req, res) => {
                 sendEMail(result.rows[0].email).then((code) => {
                     db.addResetCode(req.body.email, code)
                         .then((result) => {
-                            console.log(result.rows[0].created_at);
-                            let oldDate = new Date(result.rows[0].created_at);
-                            console.log(oldDate);
-
-                            let newDate = new Date(
-                                oldDate.getTime() + 10 * 60000
-                            );
-                            console.log("new:", newDate);
-                            // include the time operation here so that I sent the time of expected answer
-                            res.json({ codeValidUntil: newDate });
+                            if (result.rowCount > 0) {
+                                // console.log(result.rows[0].created_at);
+                                let startDate = new Date(
+                                    result.rows[0].created_at
+                                );
+                                let endDate = new Date(
+                                    startDate.getTime() +
+                                        CODE_VALIDITY_IN_MINUTES * 60000
+                                ).valueOf();
+                                res.json({ codeValidUntil: endDate });
+                            } else {
+                                console.log("couldnt read addUser-Result");
+                                res.json({
+                                    error: "couldnt read addUser-Result",
+                                });
+                            }
                         })
                         .catch((err) => {
                             console.log("Error in Writing Code to DB:", err);
@@ -130,7 +137,11 @@ app.post("/password/reset/start", (req, res) => {
 app.post("/password/reset/code", (req, res) => {
     // console.log("welcome to POST RESET CODE with", req.body);
     return db
-        .confirmCode(req.body.code, req.body.email)
+        .confirmCode(
+            req.body.code,
+            CODE_VALIDITY_IN_MINUTES.toString(),
+            req.body.email
+        )
         .then((isCodeValid) => {
             // console.log("check of code:", isCodeValid);
             if (isCodeValid) {
@@ -167,6 +178,7 @@ app.get("/user", (req, res) => {
                     first: result.rows[0].first,
                     last: result.rows[0].last,
                     url: result.rows[0].profile_pic_url,
+                    bio: result.rows[0].bio,
                 });
             } else {
                 res.json({ error: "user could not be found" });
@@ -190,6 +202,22 @@ app.post("/profile-pic", uploader.single("file"), uploadToAWS, (req, res) => {
         .catch((err) => res.json({ error: "couldn't write to DB:", err }));
 
     // res.json({ error: "temporary response" });
+});
+
+app.post("/profile-bio", (req, res) => {
+    // console.log("Server received BIO POST:", req.body);
+    db.addBio(req.body.bio, req.session.userId)
+        .then((result) => {
+            // console.log(result);
+            if (result.rowCount > 0) {
+                res.json({ update: "success" });
+            } else {
+                res.json({ error: "Could not write Bio to DB" });
+            }
+        })
+        .catch((err) => {
+            res.json({ error: "DB rejected Bio" });
+        });
 });
 
 app.get("/logout", (req, res) => {

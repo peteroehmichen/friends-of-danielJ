@@ -1,14 +1,15 @@
 // import React from "react";
 
 export default function ProfilePic(props) {
+    // console.log("Props in ProfilePic:", props);
+
     return (
-        <div className="profile-picture">
-            <h1>
-                Hello, {props.first} {props.last}
-            </h1>
-            <img src={props.profilePicUrl} alt={props.first} />
-            <button onClick={props.toggleUploadModal}>change Picture</button>
-        </div>
+        <img
+            src={props.profilePicUrl}
+            alt={props.first}
+            className={`profile-picture debug-green ${props.size}`}
+            onClick={props.toggleUploadModal}
+        />
     );
 }
 
