@@ -45,15 +45,21 @@ export default class Uploader extends React.Component {
             profilePicture.append("file", this.state.file);
 
             axios
-                .post("/profile-pic", profilePicture)
+                .post("/api/user/profile-pic.json", profilePicture)
                 .then((response) => {
-                    // console.log("Upload Post received:", response);
-                    this.setState({
-                        loading: false,
-                    });
-                    this.props.setProfilePicUrl(response.data.url);
+                    if (!response.data.error) {
+                        console.log("Upload Post received:", response);
+                        this.setState({
+                            loading: false,
+                        });
+                        this.props.setProfilePicUrl(response.data.url);
+                    } else {
+                        // set a rule for unsuccessful upload
+                    }
                 })
                 .catch((err) => {
+                    // set a rule for unsuccessful upload
+
                     this.setState({
                         loading: false,
                     });

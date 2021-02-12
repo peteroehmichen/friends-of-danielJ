@@ -42,7 +42,7 @@ app.get("/welcome", (req, res) => {
     }
 });
 
-app.post("/registration", (req, res) => {
+app.post("/api/registration.json", (req, res) => {
     const { first, last, email, password } = req.body;
     if (first == "" || last == "" || !email.includes("@") || password == "") {
         res.json({ error: "23502" }); // same error code when DB reject an empty field
@@ -68,7 +68,7 @@ app.post("/registration", (req, res) => {
     }
 });
 
-app.post("/login", (req, res) => {
+app.post("/api/login.json", (req, res) => {
     // console.log("received:", req.body);
     db.getAuthenticatedUser(req.body.email, req.body.password)
         .then((result) => {
@@ -89,7 +89,7 @@ app.post("/login", (req, res) => {
         });
 });
 
-app.post("/password/reset/start", (req, res) => {
+app.post("/api/password/reset.json", (req, res) => {
     return db
         .getUserByEmail(req.body.email)
         .then((result) => {
@@ -134,7 +134,7 @@ app.post("/password/reset/start", (req, res) => {
         });
 });
 
-app.post("/password/reset/code", (req, res) => {
+app.post("/api/password/code.json", (req, res) => {
     // console.log("welcome to POST RESET CODE with", req.body);
     return db
         .confirmCode(
@@ -169,42 +169,90 @@ app.post("/password/reset/code", (req, res) => {
         });
 });
 
-app.get("/user", (req, res) => {
-    return db
-        .getUserById(req.session.userId)
-        .then((result) => {
-            if (result.rowCount > 0) {
-                return res.json({
-                    first: result.rows[0].first,
-                    last: result.rows[0].last,
-                    url: result.rows[0].profile_pic_url,
-                    bio: result.rows[0].bio,
-                });
-            } else {
-                res.json({ error: "user could not be found" });
-            }
-        })
-        .catch((err) => res.json({ error: "DB Error" }));
+app.post("/api/user/data.json", async (req, res) => {
+    console.log("received to /user.json:", req.body);
+    if (req.body.id == req.session.userId) {
+        return res.json({ error: "requesting identical user" });
+    }
+    const idForDb = req.body.id == 0 ? req.session.userId : req.body.id;
+    try {
+        const result = await db.getUserById(idForDb);
+        if (result.rowCount > 0) {
+            return res.json({
+                first: result.rows[0].first,
+                last: result.rows[0].last,
+                url: result.rows[0].profile_pic_url,
+                bio: result.rows[0].bio,
+            });
+        } else {
+            res.json({ error: "user could not be found" });
+        }
+    } catch (err) {
+        res.json({ error: "DB Error" });
+    }
 });
 
-app.post("/profile-pic", uploader.single("file"), uploadToAWS, (req, res) => {
-    // console.log("PostRoute body:", req.body.url);
-    // console.log("PostRoute file:", req.file);
-    db.addProfilePic(req.body.url, req.session.userId)
-        .then((result) => {
-            // console.log("DB-Result:", result);
-            if (result.rowCount > 0) {
-                res.json({ url: req.body.url });
+// pre-async-version
+
+// app.get("/user", (req, res) => {
+//     return db
+//         .getUserById(req.session.userId)
+//         .then((result) => {
+//             if (result.rowCount > 0) {
+//                 return res.json({
+//                     first: result.rows[0].first,
+//                     last: result.rows[0].last,
+//                     url: result.rows[0].profile_pic_url,
+//                     bio: result.rows[0].bio,
+//                 });
+//             } else {
+//                 res.json({ error: "user could not be found" });
+//             }
+//         })
+//         .catch((err) => res.json({ error: "DB Error" }));
+// });
+
+app.post(
+    "/api/user/profile-pic.json",
+    uploader.single("file"),
+    async (req, res) => {
+        try {
+            const aws = await uploadToAWS(req);
+            let sql;
+            if (aws.url) {
+                sql = await db.addProfilePic(aws.url, req.session.userId);
+            }
+            if (sql.rowCount > 0) {
+                res.json(aws);
             } else {
                 res.json({ error: "DB rejected new picture" });
             }
-        })
-        .catch((err) => res.json({ error: "couldn't write to DB:", err }));
+        } catch (error) {
+            res.json({ error: "Upload failed - please try again" });
+        }
+    }
+);
 
-    // res.json({ error: "temporary response" });
-});
+// pre-async-version
 
-app.post("/profile-bio", (req, res) => {
+// app.post("/profile-pic", uploader.single("file"), uploadToAWS, (req, res) => {
+//     // console.log("PostRoute body:", req.body.url);
+//     // console.log("PostRoute file:", req.file);
+//     db.addProfilePic(req.body.url, req.session.userId)
+//         .then((result) => {
+//             // console.log("DB-Result:", result);
+//             if (result.rowCount > 0) {
+//                 res.json({ url: req.body.url });
+//             } else {
+//                 res.json({ error: "DB rejected new picture" });
+//             }
+//         })
+//         .catch((err) => res.json({ error: "couldn't write to DB:", err }));
+
+//     // res.json({ error: "temporary response" });
+// });
+
+app.post("/api/profile-bio.json", (req, res) => {
     // console.log("Server received BIO POST:", req.body);
     db.addBio(req.body.bio, req.session.userId)
         .then((result) => {

@@ -102,12 +102,12 @@ button {
 }
 
 .lowTimer {
-    /* color: red; */
+    color: red;
     font-weight: bold;
-    animation: lowTimer;
+    /* animation: lowTimer;
     animation-duration: 1s;
     animation-direction: alternate;
-    animation-iteration-count: infinite;
+    animation-iteration-count: infinite; */
 }
 
 @keyframes lowTimer {

@@ -18,7 +18,7 @@ export default class Countdown extends React.Component {
 
     tick() {
         const timeLeft = Math.floor(
-            (this.props.codeValidUntil - Date.now().valueOf()) / 1000
+            (this.props.deadline - Date.now().valueOf()) / 1000
         );
         let minutesLeft = Math.floor(timeLeft / 60).toString();
         let secondsLeft = Math.floor(timeLeft % 60).toString();
@@ -35,6 +35,9 @@ export default class Countdown extends React.Component {
 
     endCountdown() {
         clearInterval(this.timerId);
+        if (this.props.actionOnEnd) {
+            this.props.actionOnEnd();
+        }
     }
 
     componentWillUnmount() {

@@ -1,9 +1,11 @@
 import React from "react";
+import { BrowserRouter, Route } from "react-router-dom";
 import Uploader from "./uploader";
 import Logo from "./logo";
 import ProfilePic from "./profilePic";
 import axios from "./axios";
 import Profile from "./profile";
+import OtherProfile from "./otherProfile";
 import BioEditor from "./bioEditor";
 
 // still need to handle error messages...
@@ -22,12 +24,13 @@ export default class App extends React.Component {
         this.toggleUploadModal = this.toggleUploadModal.bind(this);
         this.setProfilePicUrl = this.setProfilePicUrl.bind(this);
         this.setBio = this.setBio.bind(this);
+        // this.render = this.render.bind(this);
     }
 
     componentDidMount() {
         // console.log("running a axios request...");
         axios
-            .get("/user")
+            .post("/api/user/data.json", { id: 0 })
             .then((result) => {
                 // console.log("received from /user:", result);
                 this.setState({
@@ -66,26 +69,45 @@ export default class App extends React.Component {
 
     render() {
         return (
-            <div className="app-frame debug-black">
-                <Logo />
-                <ProfilePic
-                    first={this.state.first}
-                    profilePicUrl={this.state.profilePicUrl}
-                    size="small"
-                    toggleUploadModal={this.toggleUploadModal}
-                />
-                {this.state.activateUploadModal && (
-                    <Uploader setProfilePicUrl={this.setProfilePicUrl} />
-                )}
-                <Profile
-                    first={this.state.first}
-                    last={this.state.last}
-                    profilePicUrl={this.state.profilePicUrl}
-                    bio={this.state.bio}
-                    setBio={this.setBio}
-                    toggleUploadModal={this.toggleUploadModal}
-                />
-            </div>
+            <BrowserRouter>
+                <div className="app-frame debug-black">
+                    <Logo />
+                    <ProfilePic
+                        first={this.state.first}
+                        profilePicUrl={this.state.profilePicUrl}
+                        size="small"
+                        toggleUploadModal={this.toggleUploadModal}
+                    />
+                    {this.state.activateUploadModal && (
+                        <Uploader setProfilePicUrl={this.setProfilePicUrl} />
+                    )}
+
+                    <Route
+                        exact
+                        path="/"
+                        render={() => (
+                            <Profile
+                                first={this.state.first}
+                                last={this.state.last}
+                                profilePicUrl={this.state.profilePicUrl}
+                                bio={this.state.bio}
+                                setBio={this.setBio}
+                                toggleUploadModal={this.toggleUploadModal}
+                            />
+                        )}
+                    />
+                    <Route
+                        path="/user/:id"
+                        render={(props) => (
+                            <OtherProfile
+                                key={props.match.url}
+                                history={props.history}
+                                match={props.match}
+                            />
+                        )}
+                    />
+                </div>
+            </BrowserRouter>
         );
     }
 }

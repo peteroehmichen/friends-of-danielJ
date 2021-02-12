@@ -42,7 +42,7 @@ export default class BioEditor extends React.Component {
             loading: true,
         });
         axios
-            .post("/profile-bio", { bio: this.state.bio })
+            .post("/api/profile-bio.json", { bio: this.state.bio })
             .then((result) => {
                 // console.log("we received from BIO POST:", result);
                 this.setState({ loading: false });

@@ -35,7 +35,7 @@ export default class Registration extends React.Component {
             });
         } else {
             axios
-                .post("/registration", this.state)
+                .post("/api/registration.json", this.state)
                 .then((res) => {
                     // console.log("answer from axios.post:", res.data);
                     if (res.data.id) {

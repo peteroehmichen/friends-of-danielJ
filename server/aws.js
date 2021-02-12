@@ -41,32 +41,53 @@ module.exports.uploader = multer({
         fileSize: 2097152,
     },
 });
-module.exports.uploadToAWS = (req, res, next) => {
+
+module.exports.uploadToAWS = async function (req) {
     if (!req.file) {
-        res.json({ error: "File does not match standards" });
-    } else {
-        const { filename, mimetype, size, path } = req.file;
-        const promise = s3
-            .putObject({
-                Bucket: "oehmichen-messageboard",
-                ACL: "public-read",
-                Key: filename,
-                Body: fs.createReadStream(path),
-                ContentType: mimetype,
-                ContentLength: size,
-            })
-            .promise();
-        promise
-            .then(() => {
-                fs.unlink(path, () => {});
-                req.body.url = S3URL + req.file.filename;
-                next();
-            })
-            .catch((err) => {
-                console.log("error in AWS-Upload:", err);
-            });
+        return { error: "File does not match standards" };
     }
+    const { filename, mimetype, size, path } = req.file;
+    await s3
+        .putObject({
+            Bucket: "oehmichen-messageboard",
+            ACL: "public-read",
+            Key: filename,
+            Body: fs.createReadStream(path),
+            ContentType: mimetype,
+            ContentLength: size,
+        })
+        .promise();
+    fs.unlink(path, () => {});
+    // console.log("AWS was successful with: ", S3URL + req.file.filename);
+    return { url: S3URL + req.file.filename };
 };
+
+// module.exports.uploadToAWS = (req, res, next) => {
+//     if (!req.file) {
+//         res.json({ error: "File does not match standards" });
+//     } else {
+//         const { filename, mimetype, size, path } = req.file;
+//         const promise = s3
+//             .putObject({
+//                 Bucket: "oehmichen-messageboard",
+//                 ACL: "public-read",
+//                 Key: filename,
+//                 Body: fs.createReadStream(path),
+//                 ContentType: mimetype,
+//                 ContentLength: size,
+//             })
+//             .promise();
+//         promise
+//             .then(() => {
+//                 fs.unlink(path, () => {});
+//                 req.body.url = S3URL + req.file.filename;
+//                 next();
+//             })
+//             .catch((err) => {
+//                 console.log("error in AWS-Upload:", err);
+//             });
+//     }
+// };
 
 module.exports.sendEMail = function (recipient) {
     const newCode = cryptoRandomString({ length: 6 });

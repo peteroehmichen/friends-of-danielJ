@@ -29,7 +29,9 @@ export default class PasswordReset extends React.Component {
             this.setState({ error: "Field is incorrectly filled" });
         } else {
             axios
-                .post("/password/reset/start", { email: this.state.email })
+                .post("/api/password/reset.json", {
+                    email: this.state.email,
+                })
                 .then((result) => {
                     console.log("result from POST RESET", result);
                     if (result.data.codeValidUntil) {
@@ -58,7 +60,7 @@ export default class PasswordReset extends React.Component {
             this.setState({ error: "Fields cannot be empty" });
         } else {
             axios
-                .post("/password/reset/code", {
+                .post("/api/password/code.json", {
                     code: this.state.code,
                     password: this.state.password,
                     email: this.state.email,
@@ -106,7 +108,7 @@ export default class PasswordReset extends React.Component {
                 <div>
                     <h4>
                         remaining Time:{" "}
-                        <Countdown codeValidUntil={this.state.codeValidUntil} />
+                        <Countdown deadline={this.state.codeValidUntil} />
                     </h4>
                     <input
                         onChange={(e) => this.changeHandler(e)}

@@ -20,7 +20,7 @@ export default class Login extends React.Component {
     submitHandler() {
         // console.log("submit detected, sending", this.state);
         axios
-            .post("/login", this.state)
+            .post("/api/login.json", this.state)
             .then((result) => {
                 console.log("received from axios.post:", result);
                 if (result.data.first) {
