@@ -44,18 +44,8 @@ export default class Registration extends React.Component {
                         });
                         location.replace("/");
                     } else {
-                        let msg;
-                        if (res.data.error == "23505") {
-                            msg = "E-Mail already exists";
-                        } else if (res.data.error == "23502") {
-                            msg =
-                                "please check input quality (i.e. E-Mail with @ and no empty fields)";
-                        } else {
-                            msg = "unknown Error while Registration";
-                        }
-
                         this.setState({
-                            error: msg,
+                            error: res.data.error,
                         });
                     }
                 })

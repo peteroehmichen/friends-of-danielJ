@@ -22,7 +22,7 @@ export default class Login extends React.Component {
         axios
             .post("/api/login.json", this.state)
             .then((result) => {
-                console.log("received from axios.post:", result);
+                console.log("received from axios.post:", result.data);
                 if (result.data.first) {
                     this.setState({
                         error: false,

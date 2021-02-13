@@ -1,4 +1,4 @@
-const { hash, compare } = require("./authenticate");
+const auth = require("./auth");
 const spicedPg = require("spiced-pg");
 const sql = spicedPg(
     process.env.DATABASE_URL ||
@@ -25,25 +25,25 @@ module.exports.addBio = function (bio, id) {
     return sql.query(`UPDATE users SET bio = $1 WHERE id = $2;`, [bio, id]);
 };
 
-module.exports.getAuthenticatedUser = function (email, password) {
-    return this.getUserByEmail(email).then((result) => {
-        // console.log("return from SQL:", result);
-        let user;
+module.exports.getAuthenticatedUser = async function (email, password) {
+    try {
+        const result = await this.getUserByEmail(email);
         if (result.rowCount == 1) {
-            user = result.rows[0];
-            return compare(password, result.rows[0].password).then((result) => {
-                // console.log("COMPARE:", result);
-                if (result) {
-                    return user;
-                } else {
-                    return { error: "Wrong Password" };
-                }
-            });
+            const confirmPw = await auth.compare(
+                password,
+                result.rows[0].password
+            );
+            if (confirmPw) {
+                return result.rows[0];
+            } else {
+                return { error: "Wrong Password" };
+            }
         } else {
-            // eval result if email not found
             return { error: "User not found" };
         }
-    });
+    } catch (err) {
+        return { error: "Error in DB" };
+    }
 };
 
 module.exports.getUserByEmail = function getUserByEmail(email) {
@@ -68,22 +68,21 @@ module.exports.updateUser = function (email, hashedPw) {
     ]);
 };
 
-module.exports.confirmCode = function (code, validity, email) {
+module.exports.confirmCode = async function (code, validity, email) {
     // console.log("looking for codes younger than:", validity);
-    return sql
-        .query(
+    try {
+        const result = await sql.query(
             `SELECT code FROM codes WHERE CURRENT_TIMESTAMP - created_at < INTERVAL '${validity} minutes' AND email = $1 ORDER BY id DESC;`,
             [email]
-        )
-        .then((result) => {
-            if (result.rowCount > 0) {
-                // console.log(result.rows[0].code);
-                return result.rows[0].code == code;
-            } else {
-                return false;
-            }
-        })
-        .catch((err) => {
-            console.log("error in searching code in db:", err);
-        });
+        );
+        if (result.rowCount > 0) {
+            // console.log(result.rows[0].code);
+            return result.rows[0].code == code;
+        } else {
+            return false;
+        }
+    } catch (err) {
+        console.log("error in searching code in db:", err);
+        return err;
+    }
 };

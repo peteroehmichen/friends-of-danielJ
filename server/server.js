@@ -7,7 +7,7 @@ const csurf = require("csurf");
 const { CODE_VALIDITY_IN_MINUTES } = require("../config.json");
 
 const db = require("./db");
-const { hash, compare } = require("./authenticate");
+const auth = require("./auth");
 const { sendEMail, uploader, uploadToAWS } = require("./aws");
 
 let cookie_secret = process.env.cookie_secret
@@ -42,135 +42,97 @@ app.get("/welcome", (req, res) => {
     }
 });
 
-app.post("/api/registration.json", (req, res) => {
+app.post("/api/registration.json", async (req, res) => {
     const { first, last, email, password } = req.body;
     if (first == "" || last == "" || !email.includes("@") || password == "") {
-        res.json({ error: "23502" }); // same error code when DB reject an empty field
-    } else {
-        return hash(password)
-            .then((hashedPw) => {
-                db.addUser(first, last, email, hashedPw)
-                    .then((result) => {
-                        // console.log("Setting cookie to:", result.rows[0].id);
-                        req.session.userId = result.rows[0].id;
-                        console.log(
-                            "User added to DB with id",
-                            req.session.userId
-                        );
-                        res.json(result.rows[0]);
-                    })
-                    .catch((err) => {
-                        console.log("details on error:", err);
-                        res.json({ error: err.code });
-                    });
-            })
-            .catch((err) => console.log("Error in adding User:", err));
+        return res.json({
+            error:
+                "please check input quality (i.e. E-Mail with @ and no empty fields)",
+        });
+    }
+    try {
+        const hashedPw = await auth.hash(password);
+        const result = await db.addUser(first, last, email, hashedPw);
+        req.session.userId = result.rows[0].id;
+        res.json(result.rows[0]);
+    } catch (err) {
+        if (err.code == "23505") {
+            res.json({ error: "E-Mail already exists" });
+        } else {
+            res.json({ error: "unknown Error while Registration" });
+        }
     }
 });
 
-app.post("/api/login.json", (req, res) => {
-    // console.log("received:", req.body);
-    db.getAuthenticatedUser(req.body.email, req.body.password)
-        .then((result) => {
-            // console.log("result", result);
-            if (result.id) {
-                req.session.userId = result.id;
-                res.json({
-                    first: result.first,
-                    last: result.last,
-                });
-            } else {
-                res.json(result);
-            }
-        })
-        .catch((err) => {
-            // console.log("error in authenticating user:", err);
-            res.json({ error: "Log In was rejected by server" });
-        });
+app.post("/api/login.json", async (req, res) => {
+    try {
+        const result = await db.getAuthenticatedUser(
+            req.body.email,
+            req.body.password
+        );
+        if (result.id) {
+            req.session.userId = result.id;
+            res.json({
+                first: result.first,
+                last: result.last,
+            });
+        } else {
+            res.json({ error: "Invalid Combination of user credentials" });
+        }
+    } catch (err) {
+        res.json({ error: "Log In was rejected by server" });
+    }
 });
 
-app.post("/api/password/reset.json", (req, res) => {
-    return db
-        .getUserByEmail(req.body.email)
-        .then((result) => {
+app.post("/api/password/reset.json", async (req, res) => {
+    try {
+        const user = await db.getUserByEmail(req.body.email);
+        if (user.rowCount > 0) {
+            const code = await sendEMail(user.rows[0].email);
+            const result = await db.addResetCode(req.body.email, code);
             if (result.rowCount > 0) {
-                // const user = result.rows[0];
-                sendEMail(result.rows[0].email).then((code) => {
-                    db.addResetCode(req.body.email, code)
-                        .then((result) => {
-                            if (result.rowCount > 0) {
-                                // console.log(result.rows[0].created_at);
-                                let startDate = new Date(
-                                    result.rows[0].created_at
-                                );
-                                let endDate = new Date(
-                                    startDate.getTime() +
-                                        CODE_VALIDITY_IN_MINUTES * 60000
-                                ).valueOf();
-                                res.json({ codeValidUntil: endDate });
-                            } else {
-                                console.log("couldnt read addUser-Result");
-                                res.json({
-                                    error: "couldnt read addUser-Result",
-                                });
-                            }
-                        })
-                        .catch((err) => {
-                            console.log("Error in Writing Code to DB:", err);
-                            res.json({
-                                error:
-                                    "Could not write Code to Database - please try again",
-                            });
-                        });
-                });
-                // go on...
+                const start = new Date(result.rows[0].created_at);
+                const end = new Date(
+                    start.getTime() + CODE_VALIDITY_IN_MINUTES * 60000
+                ).valueOf();
+                res.json({ codeValidUntil: end });
             } else {
-                res.json({ error: "User not found..." });
+                res.json({
+                    error: "couldn't read addUser-Result",
+                });
             }
-        })
-        .catch((err) => {
-            console.log("error in reset start PW:", err);
-            res.json({ error: "unknown error in DB" });
-        });
+        } else {
+            res.json({ error: "User not found..." });
+        }
+    } catch (err) {
+        res.json({ error: "unknown error in DB" });
+    }
 });
 
-app.post("/api/password/code.json", (req, res) => {
-    // console.log("welcome to POST RESET CODE with", req.body);
-    return db
-        .confirmCode(
+app.post("/api/password/code.json", async (req, res) => {
+    try {
+        const isCodeValid = await db.confirmCode(
             req.body.code,
             CODE_VALIDITY_IN_MINUTES.toString(),
             req.body.email
-        )
-        .then((isCodeValid) => {
-            // console.log("check of code:", isCodeValid);
-            if (isCodeValid) {
-                return hash(req.body.password)
-                    .then((hashedPw) => db.updateUser(req.body.email, hashedPw))
-                    .then((result) => {
-                        // console.log("updating user:", result);
-                        if (result.rowCount > 0) {
-                            res.json({ update: "ok" });
-                        } else {
-                            res.json({ error: "Error in resetting password" });
-                        }
-                    })
-                    .catch((err) => {
-                        console.log("error in updating user:", err);
-                        res.json({ error: "error in updating user" });
-                    });
+        );
+        if (isCodeValid) {
+            const hashedPw = await auth.hash(req.body.password);
+            const result = await db.updateUser(req.body.email, hashedPw);
+            if (result.rowCount > 0) {
+                res.json({ update: "ok" });
             } else {
-                res.json({ error: "Code is invalid" });
+                res.json({ error: "Error in resetting password" });
             }
-        })
-        .catch((err) => {
-            console.log("there was an error in code-confirmation:", err);
-            res.json({ error: "there was an error in code-confirmation" });
-        });
+        } else {
+            res.json({ error: "Code is invalid" });
+        }
+    } catch (err) {
+        res.json({ error: "there was an error in code-confirmation" });
+    }
 });
 
 app.post("/api/user/data.json", async (req, res) => {
-    console.log("received to /user.json:", req.body);
     if (req.body.id == req.session.userId) {
         return res.json({ error: "requesting identical user" });
     }
@@ -191,26 +153,6 @@ app.post("/api/user/data.json", async (req, res) => {
         res.json({ error: "DB Error" });
     }
 });
-
-// pre-async-version
-
-// app.get("/user", (req, res) => {
-//     return db
-//         .getUserById(req.session.userId)
-//         .then((result) => {
-//             if (result.rowCount > 0) {
-//                 return res.json({
-//                     first: result.rows[0].first,
-//                     last: result.rows[0].last,
-//                     url: result.rows[0].profile_pic_url,
-//                     bio: result.rows[0].bio,
-//                 });
-//             } else {
-//                 res.json({ error: "user could not be found" });
-//             }
-//         })
-//         .catch((err) => res.json({ error: "DB Error" }));
-// });
 
 app.post(
     "/api/user/profile-pic.json",
@@ -233,44 +175,21 @@ app.post(
     }
 );
 
-// pre-async-version
-
-// app.post("/profile-pic", uploader.single("file"), uploadToAWS, (req, res) => {
-//     // console.log("PostRoute body:", req.body.url);
-//     // console.log("PostRoute file:", req.file);
-//     db.addProfilePic(req.body.url, req.session.userId)
-//         .then((result) => {
-//             // console.log("DB-Result:", result);
-//             if (result.rowCount > 0) {
-//                 res.json({ url: req.body.url });
-//             } else {
-//                 res.json({ error: "DB rejected new picture" });
-//             }
-//         })
-//         .catch((err) => res.json({ error: "couldn't write to DB:", err }));
-
-//     // res.json({ error: "temporary response" });
-// });
-
-app.post("/api/profile-bio.json", (req, res) => {
-    // console.log("Server received BIO POST:", req.body);
-    db.addBio(req.body.bio, req.session.userId)
-        .then((result) => {
-            // console.log(result);
-            if (result.rowCount > 0) {
-                res.json({ update: "success" });
-            } else {
-                res.json({ error: "Could not write Bio to DB" });
-            }
-        })
-        .catch((err) => {
-            res.json({ error: "DB rejected Bio" });
-        });
+app.post("/api/profile-bio.json", async (req, res) => {
+    try {
+        const result = await db.addBio(req.body.bio, req.session.userId);
+        if (result.rowCount > 0) {
+            res.json({ update: "success" });
+        } else {
+            res.json({ error: "Could not write Bio to DB" });
+        }
+    } catch (err) {
+        res.json({ error: "DB rejected Bio" });
+    }
 });
 
 app.get("/logout", (req, res) => {
     req.session = null;
-    console.log("All user cookies deleted");
     res.redirect("/welcome");
 });
 

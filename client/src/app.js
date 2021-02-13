@@ -71,6 +71,9 @@ export default class App extends React.Component {
         return (
             <BrowserRouter>
                 <div className="app-frame debug-black">
+                    <p>
+                        <a href="/logout">Logout</a>
+                    </p>
                     <Logo />
                     <ProfilePic
                         first={this.state.first}
