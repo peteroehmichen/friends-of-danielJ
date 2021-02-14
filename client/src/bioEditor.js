@@ -1,5 +1,5 @@
 import axios from "./axios";
-import Spinner from "./spinner";
+import { Spinner } from "./helpers";
 import React from "react";
 
 export default class BioEditor extends React.Component {

@@ -1,4 +1,5 @@
 import { HashRouter, Route, Link } from "react-router-dom";
+import { Fragment } from "react";
 import Registration from "./registration";
 import Login from "./login";
 import PasswordReset from "./passwordReset";
@@ -6,16 +7,23 @@ import PasswordReset from "./passwordReset";
 // sole purpose is to create the pane for registration component
 
 // called "dumb" or "presentational" components (because they dont have much functionaility. - "Pre-hooks")
-export default function Welcome() {
+export default function Welcome(props) {
     return (
-        <div>
-            <h1>Welcome!</h1>
+        <div className="welcome">
+            <div className="welcome-intro">
+                <p>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Enim, consequuntur cum! Qui libero odio, ducimus molestiae
+                    aperiam nemo eos quis sed eveniet dolor, quam ipsam
+                    excepturi deserunt suscipit provident ea.
+                </p>
+            </div>
             <HashRouter>
-                <div>
+                <Fragment>
                     <Route exact path="/" component={Registration} />
                     <Route path="/login" component={Login} />
                     <Route path="/reset" component={PasswordReset} />
-                </div>
+                </Fragment>
             </HashRouter>
         </div>
     );

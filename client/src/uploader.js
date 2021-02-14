@@ -1,6 +1,6 @@
 import axios from "./axios";
 import React from "react";
-import Spinner from "./spinner";
+import { Spinner } from "./helpers";
 
 // still need to block upload button when uploading
 

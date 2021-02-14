@@ -1,17 +1,75 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+
 body {
     background-color: ghostwhite;
-}
-
-.newClass {
-    color: tomato;
-}
-
-.register,
-.login,
-.reset {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-between;
+}
+
+main {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-image: url("wp3.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+footer {
+    height: 40px;
+    width: 100%;
+    padding: 5px 0;
+    background-color: rgba(0, 0, 0, 0.87);
+    color: rgba(255, 255, 255, 0.721);
+    text-align: center;
+}
+
+a {
+    /* text-transform: uppercase; */
+    color: inherit;
+    font-weight: bold;
+}
+
+p {
+    padding: 5px 5px 15px 5px;
+}
+
+.welcome {
+    padding: 20px;
+    border-radius: 15px;
+    width: 60%;
+    min-width: 550px;
+    height: 60%;
+    min-height: 400px;
+    background-color: rgba(255, 255, 255, 0.75);
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+
+.welcome-blocks {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100%;
+}
+
+.welcome-blocks .title {
+    align-self: flex-start;
 }
 
 .form {
@@ -20,12 +78,31 @@ body {
     align-items: center;
 }
 
-input[type="text"] {
+.form p {
+    font-family: "Courier New", Courier, monospace;
+}
+
+.welcome-footnote {
+    margin-top: auto;
+}
+
+.welcome-footnote p {
+    padding: 0;
+    margin: 0;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    width: 250px;
     margin: 10px;
+    padding-top: 5px;
     background-color: transparent;
     border: 0;
-    border-bottom: 3px solid black;
-    font-size: 1em;
+    border-bottom: 3px solid orangered;
+    font-size: 1.1em;
+    font-family: "Courier New", Courier, monospace;
+    outline: none;
 }
 
 /* new stuff begin */
@@ -71,14 +148,25 @@ label > img {
 /* new stuff end */
 
 button {
+    margin: 10px 0;
     position: relative;
-    background-color: tomato;
+    /* background-color: tomato; */
     font-weight: bold;
     border-radius: 5px;
     padding: 5px;
     font-size: 1em;
-    min-width: 80px;
-    min-height: 40px;
+    width: 90%;
+    min-width: 150px;
+    height: 30px;
+    overflow: hidden;
+}
+
+.error-btn {
+    color: red;
+}
+
+.newClass {
+    color: tomato;
 }
 
 .profile-picture {

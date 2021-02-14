@@ -46,8 +46,7 @@ app.post("/api/registration.json", async (req, res) => {
     const { first, last, email, password } = req.body;
     if (first == "" || last == "" || !email.includes("@") || password == "") {
         return res.json({
-            error:
-                "please check input quality (i.e. E-Mail with @ and no empty fields)",
+            error: "Prohibited input",
         });
     }
     try {
@@ -59,7 +58,7 @@ app.post("/api/registration.json", async (req, res) => {
         if (err.code == "23505") {
             res.json({ error: "E-Mail already exists" });
         } else {
-            res.json({ error: "unknown Error while Registration" });
+            res.json({ error: "Unknown error" });
         }
     }
 });
@@ -77,10 +76,10 @@ app.post("/api/login.json", async (req, res) => {
                 last: result.last,
             });
         } else {
-            res.json({ error: "Invalid Combination of user credentials" });
+            res.json({ error: "Invalid user credentials" });
         }
     } catch (err) {
-        res.json({ error: "Log In was rejected by server" });
+        res.json({ error: "Log in rejected" });
     }
 });
 
@@ -98,14 +97,14 @@ app.post("/api/password/reset.json", async (req, res) => {
                 res.json({ codeValidUntil: end });
             } else {
                 res.json({
-                    error: "couldn't read addUser-Result",
+                    error: "Couldn't read DB",
                 });
             }
         } else {
-            res.json({ error: "User not found..." });
+            res.json({ error: "User not found" });
         }
     } catch (err) {
-        res.json({ error: "unknown error in DB" });
+        res.json({ error: "Unknown error in DB" });
     }
 });
 
@@ -122,19 +121,19 @@ app.post("/api/password/code.json", async (req, res) => {
             if (result.rowCount > 0) {
                 res.json({ update: "ok" });
             } else {
-                res.json({ error: "Error in resetting password" });
+                res.json({ error: "Error in password-reset" });
             }
         } else {
-            res.json({ error: "Code is invalid" });
+            res.json({ error: "Invalid code" });
         }
     } catch (err) {
-        res.json({ error: "there was an error in code-confirmation" });
+        res.json({ error: "Unknown error" });
     }
 });
 
 app.post("/api/user/data.json", async (req, res) => {
     if (req.body.id == req.session.userId) {
-        return res.json({ error: "requesting identical user" });
+        return res.json({ error: "Cannot display YOU" });
     }
     const idForDb = req.body.id == 0 ? req.session.userId : req.body.id;
     try {
@@ -147,10 +146,10 @@ app.post("/api/user/data.json", async (req, res) => {
                 bio: result.rows[0].bio,
             });
         } else {
-            res.json({ error: "user could not be found" });
+            res.json({ error: "Unknown user" });
         }
     } catch (err) {
-        res.json({ error: "DB Error" });
+        res.json({ error: "Error in database" });
     }
 });
 
@@ -170,7 +169,7 @@ app.post(
                 res.json({ error: "DB rejected new picture" });
             }
         } catch (error) {
-            res.json({ error: "Upload failed - please try again" });
+            res.json({ error: "Upload failed" });
         }
     }
 );
@@ -181,7 +180,7 @@ app.post("/api/profile-bio.json", async (req, res) => {
         if (result.rowCount > 0) {
             res.json({ update: "success" });
         } else {
-            res.json({ error: "Could not write Bio to DB" });
+            res.json({ error: "Could not write to DB" });
         }
     } catch (err) {
         res.json({ error: "DB rejected Bio" });

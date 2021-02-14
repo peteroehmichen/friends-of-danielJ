@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import axios from "./axios";
 import Countdown from "./countdown";
+import { formEval, Spinner } from "./helpers";
 
 export default class PasswordReset extends React.Component {
     constructor() {
@@ -13,36 +14,51 @@ export default class PasswordReset extends React.Component {
             codeValidUntil: 0,
             error: false,
             step: 1,
+            loading: false,
         };
     }
 
     changeHandler(e) {
-        this.setState({
-            [e.target.name]: e.target.value,
-        });
-        // console.log(this.state);
+        const passedValue = formEval(e);
+        if (passedValue) {
+            this.setState({
+                [e.target.name]: passedValue,
+                error: false,
+            });
+        } else {
+            this.setState({
+                [e.target.name]: "",
+                error: false,
+            });
+        }
     }
 
     submitReset() {
+        console.log("before", this.state);
         if (!this.state.email.includes("@")) {
             // console.log("incorrect mail");
             this.setState({ error: "Field is incorrectly filled" });
         } else {
+            this.setState({ loading: true });
             axios
                 .post("/api/password/reset.json", {
                     email: this.state.email,
                 })
                 .then((result) => {
-                    console.log("result from POST RESET", result);
+                    // console.log("result from POST RESET", result);
+                    console.log("after", this.state);
+
                     if (result.data.codeValidUntil) {
                         this.setState({
                             codeValidUntil: result.data.codeValidUntil,
                             step: 2,
                             error: false,
+                            loading: false,
                         });
                     } else {
                         this.setState({
                             error: result.data.error,
+                            loading: false,
                         });
                     }
                 })
@@ -50,6 +66,7 @@ export default class PasswordReset extends React.Component {
                     console.log("Error in POST Reset", err);
                     this.setState({
                         error: "There was a server Error",
+                        loading: false,
                     });
                 });
         }
@@ -59,6 +76,7 @@ export default class PasswordReset extends React.Component {
         if (this.state.code == "" || this.state.password == "") {
             this.setState({ error: "Fields cannot be empty" });
         } else {
+            this.setState({ loading: true });
             axios
                 .post("/api/password/code.json", {
                     code: this.state.code,
@@ -72,15 +90,18 @@ export default class PasswordReset extends React.Component {
                         this.setState({
                             step: 3,
                             error: false,
+                            loading: false,
                         });
                     } else {
                         this.setState({
                             error: result.data.error,
+                            loading: false,
                         });
                     }
                 })
                 .catch((err) => {
                     console.log("Error in POST Reset", err);
+                    this.setState({ loading: false });
                 });
         }
 
@@ -91,7 +112,7 @@ export default class PasswordReset extends React.Component {
     renderStep() {
         if (this.state.step === 1) {
             return (
-                <div>
+                <div className="form">
                     <input
                         onChange={(e) => this.changeHandler(e)}
                         type="email"
@@ -100,12 +121,24 @@ export default class PasswordReset extends React.Component {
                         placeholder="E-Mail"
                         key={1}
                     />
-                    <button onClick={() => this.submitReset()}>Submit</button>
+                    <button
+                        className={(this.state.error && "error-btn") || " "}
+                        disabled={!this.state.email || this.state.error}
+                        onClick={() => this.submitReset()}
+                    >
+                        {this.state.error ? (
+                            this.state.error
+                        ) : this.state.loading ? (
+                            <Spinner />
+                        ) : (
+                            "Request Code"
+                        )}
+                    </button>
                 </div>
             );
         } else if (this.state.step === 2) {
             return (
-                <div>
+                <div className="form">
                     <h4>
                         remaining Time:{" "}
                         <Countdown deadline={this.state.codeValidUntil} />
@@ -126,31 +159,51 @@ export default class PasswordReset extends React.Component {
                         placeholder="New password"
                         key={3}
                     />
-                    <button onClick={() => this.submitCode()}>Submit</button>
+                    <button
+                        className={(this.state.error && "error-btn") || " "}
+                        disabled={!this.state.code || !this.state.password}
+                        onClick={() => this.submitCode()}
+                    >
+                        {this.state.error ? (
+                            this.state.error
+                        ) : this.state.loading ? (
+                            <Spinner />
+                        ) : (
+                            "Send Code"
+                        )}
+                    </button>
                 </div>
             );
         } else if (this.state.step === 3) {
-            return (
-                <div>
-                    <h3>Password Reset successfull</h3>
-                </div>
-            );
+            if (this.state.error) {
+                return (
+                    <div className="form error">
+                        {this.state.error && <p>{this.state.error}</p>}
+                    </div>
+                );
+            } else {
+                return (
+                    <div className="form">
+                        <h1>✔︎</h1>
+                    </div>
+                );
+            }
         }
     }
 
     render() {
         return (
-            <div className="reset">
-                <div className="loginTitle">
-                    <h2>We require the following information</h2>
+            <div className="welcome-blocks reset">
+                <div className="title">
+                    <h3>Reset your password...</h3>
                 </div>
                 {this.renderStep()}
-                <div className="error">
-                    {this.state.error && <p>{this.state.error}</p>}
+                <div className="welcome-footnote">
+                    <p>
+                        Go back to Log In Page.{" "}
+                        <Link to="/login">click here</Link>
+                    </p>
                 </div>
-                <p>
-                    Go back to Log In Page. <Link to="/login">Click here</Link>
-                </p>
             </div>
         );
     }

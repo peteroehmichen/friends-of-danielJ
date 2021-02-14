@@ -1,12 +1,14 @@
 import React from "react";
 import axios from "./axios";
 import { Link } from "react-router-dom";
+import { formEval, Spinner } from "./helpers";
 
 export default class Registration extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             error: false,
+            loading: false,
             first: "",
             last: "",
             email: "",
@@ -15,9 +17,19 @@ export default class Registration extends React.Component {
     }
 
     changeHandler(e) {
-        this.setState({
-            [e.target.name]: e.target.value,
-        });
+        const passedValue = formEval(e);
+        if (passedValue) {
+            this.setState({
+                [e.target.name]: passedValue,
+                error: false,
+            });
+        } else {
+            this.setState({
+                [e.target.name]: "",
+                error: false,
+            });
+        }
+        // console.log("Evaluated:", this.state);
     }
 
     submitHandler() {
@@ -34,6 +46,7 @@ export default class Registration extends React.Component {
                 error: "please fill out all the fields",
             });
         } else {
+            this.setState({ loading: true });
             axios
                 .post("/api/registration.json", this.state)
                 .then((res) => {
@@ -46,6 +59,7 @@ export default class Registration extends React.Component {
                     } else {
                         this.setState({
                             error: res.data.error,
+                            loading: false,
                         });
                     }
                 })
@@ -53,6 +67,7 @@ export default class Registration extends React.Component {
                     // console.log("caught in catch of axios-post:", err);
                     this.setState({
                         error: "Unkown Error during contact to Database",
+                        loading: false,
                     });
                 });
         }
@@ -60,9 +75,9 @@ export default class Registration extends React.Component {
 
     render() {
         return (
-            <div className="register">
-                <div className="registerTitle">
-                    <h2>We require the following information</h2>
+            <div className="welcome-blocks register">
+                <div className="title">
+                    <h3>Please sign up with your personal information</h3>
                 </div>
                 <div className="form">
                     <input
@@ -70,6 +85,7 @@ export default class Registration extends React.Component {
                         type="text"
                         name="first"
                         placeholder="First name"
+                        autoComplete="new-password"
                     />
                     <input
                         onChange={(e) => this.changeHandler(e)}
@@ -79,7 +95,7 @@ export default class Registration extends React.Component {
                     />
                     <input
                         onChange={(e) => this.changeHandler(e)}
-                        type="text"
+                        type="email"
                         name="email"
                         placeholder="E-Mail"
                     />
@@ -89,10 +105,28 @@ export default class Registration extends React.Component {
                         name="password"
                         placeholder="password"
                     />
-                    <button onClick={() => this.submitHandler()}>Submit</button>
-                    <div className="error">
-                        {this.state.error && <p>{this.state.error}</p>}
-                    </div>
+                    <button
+                        className={(this.state.error && "error-btn") || " "}
+                        disabled={
+                            !this.state.first ||
+                            !this.state.last ||
+                            !this.state.email ||
+                            !this.state.password ||
+                            this.state.error ||
+                            this.state.loading
+                        }
+                        onClick={() => this.submitHandler()}
+                    >
+                        {this.state.error ? (
+                            this.state.error
+                        ) : this.state.loading ? (
+                            <Spinner />
+                        ) : (
+                            "Register"
+                        )}
+                    </button>
+                </div>
+                <div className="welcome-footnote">
                     <p>
                         Already a user? Click here to{" "}
                         <Link to="/login">log in</Link>
