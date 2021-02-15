@@ -15,6 +15,7 @@ body {
 }
 
 main {
+    position: relative;
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -44,6 +45,22 @@ a {
 
 p {
     padding: 5px 5px 15px 5px;
+}
+
+.logo {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+.logo-nav {
+    width: 100px;
+    height: 100px;
+    position: static;
+    top: 10px;
+    left: 10px;
 }
 
 .welcome {
@@ -105,7 +122,129 @@ input[type="email"] {
     outline: none;
 }
 
-/* new stuff begin */
+.app-frame {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    width: 100%;
+    height: 120px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-bar {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.nav-element {
+    width: 150px;
+    height: 30px;
+    border: 1px solid black;
+    /* border-radius: 10px; */
+}
+
+.app-main {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    overflow: hidden;
+}
+
+.uploader {
+    position: absolute;
+    top: 0;
+    left: -300px;
+    width: 300px;
+    height: 100%;
+    /* transform: scaleX(0.001); */
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    /* transition: transform 3s; */
+}
+
+.move {
+    transform: scaleX(1);
+    /* transform: width(300px); */
+    transition: transform 3s;
+}
+
+.main-view {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+.logout-icon {
+    height: 30px;
+}
+
+#searchFriend {
+    background-color: #fff;
+    border-radius: 30px;
+    width: 70%;
+    height: 50px;
+    border: 1px solid black;
+    font-size: 1.4em;
+    padding: 0 30px;
+}
+
+.friend-results {
+    margin-left: 50px;
+    /* border: 1px solid black; */
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+}
+
+.friend-results-header,
+.friend-results-body {
+    width: 100%;
+}
+
+.found-friend {
+    margin: 10px;
+    padding: 10px;
+    width: 100%;
+    height: 150px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    overflow: hidden;
+    background-color: grey;
+    border-radius: 10px;
+}
+
+.friend-pic-small {
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.friend-pic-small img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.friend-summary {
+    margin-left: 10px;
+}
 
 #file {
     width: 0.1px;
@@ -214,7 +353,6 @@ button {
     left: 0;
     width: 100%;
     height: 100%;
-    /* background-color: rgba(0, 0, 0, 0.3); */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -273,3 +411,140 @@ button {
 .debug-brown {
     border: 3px solid brown;
 }
+
+/*
+@media screen and (max-width: 499px) {
+    body {
+        height: 100vh;
+        width: 100vw;
+    }
+
+    main {
+        width: 100%;
+        height: 100%;
+    }
+
+    footer {
+        height: 40px;
+        width: 100%;
+        padding: 5px 0;
+    }
+
+    p {
+        padding: 5px 5px 15px 5px;
+    }
+
+    .welcome {
+        padding: 20px;
+        border-radius: 15px;
+        width: 100%;
+        min-width: 10px;
+        height: 100%;
+        min-height: 10px;
+    }
+
+    .welcome-blocks {
+        height: 100%;
+    }
+
+    .welcome-blocks .title {
+        align-self: flex-start;
+    }
+
+    .form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .welcome-footnote p {
+        padding: 0;
+        margin: 0;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="email"] {
+        width: 250px;
+        margin: 10px;
+        padding-top: 5px;
+        background-color: transparent;
+        border: 0;
+        border-bottom: 3px solid orangered;
+        font-size: 1.1em;
+        font-family: "Courier New", Courier, monospace;
+        outline: none;
+    }
+
+  
+
+    #file {
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+    }
+
+    label {
+        width: 150px;
+        height: 40px;
+        overflow: hidden;
+        background-color: tomato;
+        display: flex;
+        flex-direction: row;
+        margin: 0 20px;
+        padding: 0 5px;
+
+    }
+
+    label > img {
+        width: 40px;
+        height: 35px;
+    }
+
+    #file + label {
+        font-size: 1.1em;
+        font-family: Arial, Helvetica, sans-serif;
+
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    #file + label * {
+        pointer-events: none;
+    }
+
+    button {
+        margin: 10px 0;
+        position: relative;
+
+        font-weight: bold;
+        border-radius: 5px;
+        padding: 5px;
+        font-size: 1em;
+        width: 90%;
+        min-width: 150px;
+        height: 30px;
+        overflow: hidden;
+    }
+
+    .profile-picture.small {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+    }
+
+    .profile-picture.large {
+        width: 250px;
+        height: 250px;
+        border-radius: 15px;
+    }
+
+    .bio {
+        position: relative;
+    }
+}
+
+*/

@@ -2,8 +2,8 @@
 
 export default function Logo() {
     return (
-        <div className="Logo debug-blue">
-            <h1>The logo is here</h1>
+        <div className="logo logo-nav debug-blue">
+            <h1>The logo</h1>
         </div>
     );
 }

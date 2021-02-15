@@ -54,6 +54,21 @@ module.exports.getUserById = function getUserByEmail(id) {
     return sql.query(`SELECT * FROM users WHERE id=$1`, [id]);
 };
 
+module.exports.getUserByTextSearch = function (text, userId) {
+    return sql.query(
+        `SELECT id, first, last, profile_pic_url, bio FROM users WHERE first ILIKE $1 AND id!=$2;`,
+        [text + "%", userId]
+    );
+    //
+};
+
+module.exports.getMostRecentUsers = function (limit, userId) {
+    return sql.query(
+        `SELECT id, first, last, profile_pic_url, bio FROM users WHERE id!=$1 ORDER BY id DESC LIMIT $2;`,
+        [userId, limit]
+    );
+};
+
 module.exports.addResetCode = function (email, code) {
     return sql.query(
         `INSERT INTO codes (email, code) VALUES ($1, $2) RETURNING created_at;`,

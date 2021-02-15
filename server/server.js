@@ -4,7 +4,10 @@ const compression = require("compression");
 const path = require("path");
 const cookieSession = require("cookie-session");
 const csurf = require("csurf");
-const { CODE_VALIDITY_IN_MINUTES } = require("../config.json");
+const {
+    CODE_VALIDITY_IN_MINUTES,
+    LIMIT_OF_RECENT_USERS,
+} = require("../config.json");
 
 const db = require("./db");
 const auth = require("./auth");
@@ -29,6 +32,7 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use(compression());
 
@@ -150,6 +154,32 @@ app.post("/api/user/data.json", async (req, res) => {
         }
     } catch (err) {
         res.json({ error: "Error in database" });
+    }
+});
+
+app.get("/api/findUsers.json", async (req, res) => {
+    const { search } = req.query;
+    console.log("req.body in Finder:", search);
+    let result;
+    try {
+        if (search) {
+            result = await db.getUserByTextSearch(search, req.session.userId);
+        } else {
+            result = await db.getMostRecentUsers(
+                LIMIT_OF_RECENT_USERS,
+                req.session.userId
+            );
+        }
+        if (result.rowCount > 0) {
+            res.json({
+                search,
+                result: result.rows,
+            });
+        } else {
+            res.json({ error: "no users found" });
+        }
+    } catch (err) {
+        res.json({ error: "Problem in DB" });
     }
 });
 

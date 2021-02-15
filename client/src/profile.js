@@ -12,7 +12,7 @@ export default function Profile(props) {
     } = props;
     // console.log("Props in Profile:", props);
     return (
-        <div className="debug-orange">
+        <div className="main-view own-profile debug-orange">
             <ProfilePic
                 first={first}
                 profilePicUrl={profilePicUrl}

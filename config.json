@@ -1,4 +1,5 @@
 {
     "CODE_VALIDITY_IN_MINUTES": "10",
+    "LIMIT_OF_RECENT_USERS": "3",
     "S3URL": "https://s3.amazonaws.com/oehmichen-messageboard/"
 }
