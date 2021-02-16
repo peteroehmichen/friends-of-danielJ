@@ -89,26 +89,32 @@ export default class Uploader extends React.Component {
                 </button>
             );
         }
-        let modalClass = "modal debug-red";
-        if (this.props.activateUploadModal) {
-            modalClass += " move-in";
-        }
+
         return (
-            <div className="uploader">
-                <h1>This is the upload functionality</h1>
-                <input
-                    type="file"
-                    name="file"
-                    id="file"
-                    accept="image/*"
-                    onChange={this.selectHandler}
-                    key={4}
-                />
-                <label htmlFor="file">
-                    <img src="upload_white.svg" />
-                    <span>{this.state.filename}</span>
-                </label>
-                {button}
+            <div className="overlay">
+                <div className="uploader">
+                    <h1
+                        onClick={() => {
+                            this.props.toggleUploadModal();
+                        }}
+                    >
+                        X
+                    </h1>
+                    <h1>This is the upload functionality</h1>
+                    <input
+                        type="file"
+                        name="file"
+                        id="file"
+                        accept="image/*"
+                        onChange={this.selectHandler}
+                        key={4}
+                    />
+                    <label htmlFor="file">
+                        <img src="upload_white.svg" />
+                        <span>{this.state.filename}</span>
+                    </label>
+                    {button}
+                </div>
             </div>
         );
     }

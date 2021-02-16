@@ -31,14 +31,15 @@ export default class App extends React.Component {
     componentDidMount() {
         // console.log("running a axios request...");
         axios
-            .post("/api/user/data.json", { id: 0 })
+            .get("/api/user/data.json?id=0")
             .then((result) => {
                 // console.log("received from /user:", result);
                 this.setState({
                     first: result.data.first,
                     last: result.data.last,
                     bio: result.data.bio,
-                    profilePicUrl: result.data.url || "default_user.svg",
+                    profilePicUrl:
+                        result.data.profilePicUrl || "/default_user.svg",
                 });
             })
             .catch((err) => {
@@ -47,6 +48,7 @@ export default class App extends React.Component {
     }
 
     toggleUploadModal() {
+        // console.log("modal:", this.state.activateUploadModal);
         this.setState({
             activateUploadModal: !this.state.activateUploadModal,
         });
@@ -98,11 +100,12 @@ export default class App extends React.Component {
                         </Link>
                     </div>
                     <div className="app-main">
-                        <Uploader
-                            activateUploadModal={this.activateUploadModal}
-                            setProfilePicUrl={this.setProfilePicUrl}
-                        />
-
+                        {this.state.activateUploadModal && (
+                            <Uploader
+                                toggleUploadModal={this.toggleUploadModal}
+                                setProfilePicUrl={this.setProfilePicUrl}
+                            />
+                        )}
                         <Route
                             exact
                             path="/"

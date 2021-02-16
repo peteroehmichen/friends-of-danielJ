@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS codes;
+DROP TABLE IF EXISTS friendships;
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
@@ -16,5 +17,13 @@ CREATE TABLE codes (
       id SERIAL PRIMARY KEY,
       email VARCHAR(255) NOT NULL,
       code VARCHAR(255) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE friendships (
+      id SERIAL PRIMARY KEY,
+      sender INT REFERENCES users(id) NOT NULL,
+      recipient INT REFERENCES users(id) NOT NULL,
+      confirmed BOOLEAN DEFAULT false,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

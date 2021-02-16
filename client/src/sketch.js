@@ -1,0 +1,10 @@
+let text = "InThis is a test to fiNd and display the matching patterns";
+let tag = "in";
+let regex = new RegExp(tag, "gi");
+let one = text.slice(0, text.search(regex));
+let elem = text.substr(text.search(regex), tag.length);
+let rest = text.slice(text.search(regex) + tag.length);
+console.log(text.search(regex));
+console.log(one);
+console.log(elem);
+console.log(rest);

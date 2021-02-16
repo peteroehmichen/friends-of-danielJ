@@ -28,7 +28,7 @@ export default function FindFriends(props) {
                     );
                 } else {
                     setMsg(
-                        `displaying the ${result.data.result.length} newest users`
+                        `displaying our ${result.data.result.length} newest users`
                     );
                 }
             })
@@ -60,13 +60,37 @@ export default function FindFriends(props) {
                 </div>
                 <div className="friend-results-body">
                     {friends.map((elem, index) => {
+                        let name = elem.first + " " + elem.last;
+                        const regex = new RegExp(searchInput, "gi");
+                        const one = name.slice(0, name.search(regex));
+                        const tag = name.substr(
+                            name.search(regex),
+                            searchInput.length
+                        );
+                        const rest = name.slice(
+                            name.search(regex) + searchInput.length
+                        );
+                        name = (
+                            <p>
+                                {one}
+                                <strong>{tag}</strong>
+                                {rest}
+                            </p>
+                        );
+
                         return (
                             <div key={index} className="found-friend">
                                 <div className="friend-pic-small">
                                     <Link to={`/user/${elem.id}`}>
                                         <img
                                             src={elem.profile_pic_url}
-                                            alt=""
+                                            alt="thumbnail"
+                                            onError={(e) => {
+                                                e.target.setAttribute(
+                                                    "src",
+                                                    "default_user.svg"
+                                                );
+                                            }}
                                         />
                                     </Link>
                                 </div>
@@ -74,6 +98,7 @@ export default function FindFriends(props) {
                                     <h4>
                                         {elem.first} {elem.last}
                                     </h4>
+                                    {name}
                                 </div>
                             </div>
                         );

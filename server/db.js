@@ -54,11 +54,18 @@ module.exports.getUserById = function getUserByEmail(id) {
     return sql.query(`SELECT * FROM users WHERE id=$1`, [id]);
 };
 
-module.exports.getUserByTextSearch = function (text, userId) {
-    return sql.query(
-        `SELECT id, first, last, profile_pic_url, bio FROM users WHERE first ILIKE $1 AND id!=$2;`,
-        [text + "%", userId]
-    );
+module.exports.getUserByTextSearch = async function (text, userId) {
+    const tag = text.length > 1 ? `%${text}%` : `${text}%`;
+    return {
+        first: await sql.query(
+            `SELECT id, first, last, profile_pic_url, bio FROM users WHERE first ILIKE $1 AND id!=$2;`,
+            [tag, userId]
+        ),
+        last: await sql.query(
+            `SELECT id, first, last, profile_pic_url, bio FROM users WHERE last ILIKE $1 AND id!=$2;`,
+            [tag, userId]
+        ),
+    };
     //
 };
 
@@ -100,4 +107,39 @@ module.exports.confirmCode = async function (code, validity, email) {
         console.log("error in searching code in db:", err);
         return err;
     }
+};
+
+module.exports.safeFriendRequest = function (userId, friendId) {
+    return sql.query(
+        `INSERT INTO friendships (sender, recipient) VALUES ($1, $2);`,
+        [userId, friendId]
+    );
+};
+
+module.exports.confirmFriendRequest = function (userId, friendId) {
+    return sql.query(
+        `UPDATE friendships SET confirmed=true WHERE (sender=$1 AND recipient=$2);`,
+        [friendId, userId]
+    );
+};
+
+module.exports.deleteFriendRequest = function (userId, friendId) {
+    return sql.query(
+        `DELETE FROM friendships WHERE (sender=$1 AND recipient=$2);`,
+        [userId, friendId]
+    );
+};
+
+module.exports.deleteFriendship = function (userId, friendId) {
+    return sql.query(
+        `DELETE FROM friendships WHERE (sender=$1 AND recipient=$2) OR (sender=$2 AND recipient=$1);`,
+        [userId, friendId]
+    );
+};
+
+module.exports.getFriendInfo = function (userId, friendId) {
+    return sql.query(
+        `SELECT * FROM friendships WHERE (sender=$1 AND recipient=$2) OR (sender=$2 AND recipient=$1);`,
+        [userId, friendId]
+    );
 };

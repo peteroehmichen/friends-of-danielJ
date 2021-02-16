@@ -164,14 +164,24 @@ input[type="email"] {
     overflow: hidden;
 }
 
-.uploader {
+.overlay {
     position: absolute;
+    z-index: 3;
     top: 0;
-    left: -300px;
-    width: 300px;
+    left: 0;
+    width: 100%;
     height: 100%;
-    /* transform: scaleX(0.001); */
     background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.uploader {
+    /* left: -300px; */
+    width: 300px;
+    height: 300px;
+    /* transform: scaleX(0.001); */
     overflow: hidden;
     /* transition: transform 3s; */
 }
@@ -186,7 +196,9 @@ input[type="email"] {
     position: relative;
     width: 100%;
     height: 100%;
-    overflow: auto;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .logout-icon {
@@ -209,17 +221,22 @@ input[type="email"] {
     padding: 10px;
     display: flex;
     flex-direction: column;
-    width: 300px;
+    width: 500px;
+    height: 100%;
+    overflow: hidden;
 }
 
-.friend-results-header,
 .friend-results-body {
     width: 100%;
+    height: 100%;
+    margin-right: 50px;
+    overflow-y: auto;
+    overflow-x: ;
 }
 
 .found-friend {
-    margin: 10px;
-    padding: 10px;
+    margin: 10px 0;
+    /* padding-right: 10px; */
     width: 100%;
     height: 150px;
     display: flex;
@@ -231,8 +248,9 @@ input[type="email"] {
 }
 
 .friend-pic-small {
-    width: 50%;
+    width: 40%;
     height: 100%;
+    /* margin: 5px; */
     overflow: hidden;
 }
 
@@ -244,6 +262,22 @@ input[type="email"] {
 
 .friend-summary {
     margin-left: 10px;
+}
+
+.other-profile {
+    width: 100%;
+    height: 100%;
+}
+
+.profile-pic-main {
+    width: 400px;
+    height: 400px;
+}
+
+img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 #file {
