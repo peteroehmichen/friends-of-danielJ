@@ -4,6 +4,8 @@ import axios from "./axios";
 import Countdown from "./countdown";
 import { formEval, Spinner } from "./helpers";
 
+// TODO redirect after end of Countdown
+
 export default class PasswordReset extends React.Component {
     constructor() {
         super();
@@ -33,80 +35,68 @@ export default class PasswordReset extends React.Component {
         }
     }
 
-    submitReset() {
-        console.log("before", this.state);
+    async submitReset() {
         if (!this.state.email.includes("@")) {
-            // console.log("incorrect mail");
             this.setState({ error: "Field is incorrectly filled" });
         } else {
-            this.setState({ loading: true });
-            axios
-                .post("/api/password/reset.json", {
+            try {
+                this.setState({ loading: true });
+                const result = await axios.post("/api/password/reset.json", {
                     email: this.state.email,
-                })
-                .then((result) => {
-                    // console.log("result from POST RESET", result);
-                    console.log("after", this.state);
-
-                    if (result.data.codeValidUntil) {
-                        this.setState({
-                            codeValidUntil: result.data.codeValidUntil,
-                            step: 2,
-                            error: false,
-                            loading: false,
-                        });
-                    } else {
-                        this.setState({
-                            error: result.data.error,
-                            loading: false,
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.log("Error in POST Reset", err);
+                });
+                console.log("after", this.state);
+                if (result.data.codeValidUntil) {
                     this.setState({
-                        error: "There was a server Error",
+                        codeValidUntil: result.data.codeValidUntil,
+                        step: 2,
+                        error: false,
                         loading: false,
                     });
+                } else {
+                    this.setState({
+                        error: result.data.error,
+                        loading: false,
+                    });
+                }
+            } catch (err) {
+                console.log("Error in POST Reset", err);
+                this.setState({
+                    error: "There was a server Error",
+                    loading: false,
                 });
+            }
         }
     }
 
-    submitCode() {
+    async submitCode() {
         if (this.state.code == "" || this.state.password == "") {
             this.setState({ error: "Fields cannot be empty" });
         } else {
-            this.setState({ loading: true });
-            axios
-                .post("/api/password/code.json", {
+            try {
+                this.setState({ loading: true });
+                const result = await axios.post("/api/password/code.json", {
                     code: this.state.code,
                     password: this.state.password,
                     email: this.state.email,
-                })
-                .then((result) => {
-                    // console.log("result from POST CODE", result.data);
-                    if (result.data.update == "ok") {
-                        // console.log("accept it all");
-                        this.setState({
-                            step: 3,
-                            error: false,
-                            loading: false,
-                        });
-                    } else {
-                        this.setState({
-                            error: result.data.error,
-                            loading: false,
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.log("Error in POST Reset", err);
-                    this.setState({ loading: false });
                 });
+                if (result.data.update == "ok") {
+                    // console.log("accept it all");
+                    this.setState({
+                        step: 3,
+                        error: false,
+                        loading: false,
+                    });
+                } else {
+                    this.setState({
+                        error: result.data.error,
+                        loading: false,
+                    });
+                }
+            } catch (err) {
+                console.log("Error in POST Reset", err);
+                this.setState({ loading: false });
+            }
         }
-
-        // console.log("submitting the code");
-        // console.log(this.state);
     }
 
     renderStep() {

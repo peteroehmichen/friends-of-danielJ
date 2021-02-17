@@ -17,9 +17,3 @@ module.exports.hash = async (plainPw) => {
         return err;
     }
 };
-
-// module.exports.hash = (plainPw) => {
-//     return genSalt()
-//         .then((salt) => hash(plainPw, salt))
-//         .catch((err) => console.log("Error in hasing Pw:", err));
-// };

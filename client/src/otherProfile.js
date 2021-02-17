@@ -18,30 +18,27 @@ export default class OtherProfile extends React.Component {
         };
     }
 
-    componentDidMount() {
-        // console.log("running a user request");
-        // console.log("id:", this.props.match.params.id);
-        axios
-            .get(`/api/user/data.json?id=${this.props.match.params.id}`)
-            .then(({ data }) => {
-                // console.log("result from axios other user:", data);
-                if (data.error) {
-                    this.setState({
-                        error: data.error,
-                    });
-                } else {
-                    this.setState({
-                        first: data.first,
-                        last: data.last,
-                        profilePicUrl: data.profilePicUrl || "/default_user.svg",
-                        bio: data.bio,
-                        error: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log("error in Axios for other user:", err);
-            });
+    async componentDidMount() {
+        try {
+            const { data } = await axios.get(
+                `/api/user/data.json?id=${this.props.match.params.id}`
+            );
+            if (data.error) {
+                this.setState({
+                    error: data.error,
+                });
+            } else {
+                this.setState({
+                    first: data.first,
+                    last: data.last,
+                    profilePicUrl: data.profilePicUrl || "/default_user.svg",
+                    bio: data.bio,
+                    error: false,
+                });
+            }
+        } catch (err) {
+            console.log("error in Axios for other user:", err);
+        }
     }
 
     render() {

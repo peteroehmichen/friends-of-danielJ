@@ -29,12 +29,8 @@ export default class Registration extends React.Component {
                 error: false,
             });
         }
-        // console.log("Evaluated:", this.state);
     }
-
-    submitHandler() {
-        // console.log("Submit happened for", this.state);
-
+    async submitHandler() {
         if (
             this.state.first == "" ||
             this.state.last == "" ||
@@ -47,29 +43,29 @@ export default class Registration extends React.Component {
             });
         } else {
             this.setState({ loading: true });
-            axios
-                .post("/api/registration.json", this.state)
-                .then((res) => {
-                    // console.log("answer from axios.post:", res.data);
-                    if (res.data.id) {
-                        this.setState({
-                            error: false,
-                        });
-                        location.replace("/");
-                    } else {
-                        this.setState({
-                            error: res.data.error,
-                            loading: false,
-                        });
-                    }
-                })
-                .catch((err) => {
-                    // console.log("caught in catch of axios-post:", err);
+            try {
+                const res = await axios.post(
+                    "/api/registration.json",
+                    this.state
+                );
+                if (res.data.id) {
                     this.setState({
-                        error: "Unkown Error during contact to Database",
+                        error: false,
+                    });
+                    location.replace("/");
+                } else {
+                    this.setState({
+                        error: res.data.error,
                         loading: false,
                     });
+                }
+            } catch (err) {
+                console.log("caught in catch of axios-post:", err);
+                this.setState({
+                    error: "Unkown Error during contact to Database",
+                    loading: false,
                 });
+            }
         }
     }
 

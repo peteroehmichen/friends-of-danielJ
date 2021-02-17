@@ -27,35 +27,29 @@ export default class Login extends React.Component {
         }
     }
 
-    submitHandler() {
-        // console.log("submit detected, sending", this.state);
+    async submitHandler() {
         this.setState({ loading: true });
-
-        axios
-            .post("/api/login.json", this.state)
-            .then((result) => {
-                // console.log("received from axios.post:", result.data);
-                if (result.data.first) {
-                    this.setState({
-                        error: false,
-                    });
-                    location.replace("/");
-                    // could send along the name...
-                } else if (result.data.error) {
-                    let msg = result.data.error;
-                    this.setState({
-                        error: msg,
-                        loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log("error in axios loginPost", err);
+        try {
+            const result = await axios.post("/api/login.json", this.state);
+            if (result.data.first) {
                 this.setState({
-                    error: "Unkown Error during contact to Database",
+                    error: false,
+                });
+                location.replace("/");
+            } else if (result.data.error) {
+                let msg = result.data.error;
+                this.setState({
+                    error: msg,
                     loading: false,
                 });
+            }
+        } catch (err) {
+            console.log("error in axios loginPost", err);
+            this.setState({
+                error: "Unkown Error during contact to Database",
+                loading: false,
             });
+        }
     }
 
     render() {

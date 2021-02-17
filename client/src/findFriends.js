@@ -7,38 +7,34 @@ export default function FindFriends(props) {
     const [friends, setFriends] = useState([]);
     const [msg, setMsg] = useState([]);
 
-    useEffect(() => {
-        // this is the place for an axios
+    useEffect(async () => {
         let abort;
-        axios
-            .get(`/api/findUsers.json?search=${searchInput}`)
-            .then((result) => {
-                // console.log("friends:", result.data.result);
-                if (!result.data.result) {
-                    result.data.result = [];
-                }
-                if (!abort) {
-                    setFriends(result.data.result);
-                }
-                if (result.data.error) {
-                    setMsg(result.data.error);
-                } else if (result.data.search) {
-                    setMsg(
-                        `we found ${result.data.result.length} matches for you`
-                    );
-                } else {
-                    setMsg(
-                        `displaying our ${result.data.result.length} newest users`
-                    );
-                }
-            })
-            .catch((err) => {
-                setMsg("We encountered an unknown error");
-            });
+        try {
+            const result = await axios.get(
+                `/api/findUsers.json?search=${searchInput}`
+            );
+            if (!result.data.result) {
+                result.data.result = [];
+            }
+            if (!abort) {
+                setFriends(result.data.result);
+            }
+            if (result.data.error) {
+                setMsg(result.data.error);
+            } else if (result.data.search) {
+                setMsg(`we found ${result.data.result.length} matches for you`);
+            } else {
+                setMsg(
+                    `displaying our ${result.data.result.length} newest users`
+                );
+            }
+        } catch (err) {
+            setMsg("We encountered an unknown error");
+        }
+
         return () => {
             abort = true;
         };
-        // return a cleanup
     }, [searchInput]);
 
     return (

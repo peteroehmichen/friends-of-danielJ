@@ -232,7 +232,6 @@ app.post("/api/user/friendBtn.json", async (req, res) => {
 
 app.get("/api/findUsers.json", async (req, res) => {
     const { search } = req.query;
-    console.log("req.body in Finder:", req.query);
     let result;
     try {
         if (search) {

@@ -16,7 +16,6 @@ export default class Uploader extends React.Component {
     }
 
     selectHandler(e) {
-        // console.log("e.target:", e);
         if (e.target.files[0].size > 2097152) {
             this.setState({
                 file: "",
@@ -32,10 +31,7 @@ export default class Uploader extends React.Component {
         }
     }
 
-    uploadPicture() {
-        // axios post with formdata, S3, SQL, receiving URL
-        // this.props.setProfilePicUrl("test");
-        // console.log("what to upload:", this.state);
+    async uploadPicture() {
         if (this.state.file) {
             this.setState({
                 loading: true,
@@ -44,27 +40,26 @@ export default class Uploader extends React.Component {
             const profilePicture = new FormData();
             profilePicture.append("file", this.state.file);
 
-            axios
-                .post("/api/user/profile-pic.json", profilePicture)
-                .then((response) => {
-                    if (!response.data.error) {
-                        console.log("Upload Post received:", response);
-                        this.setState({
-                            loading: false,
-                        });
-                        this.props.setProfilePicUrl(response.data.url);
-                    } else {
-                        // set a rule for unsuccessful upload
-                    }
-                })
-                .catch((err) => {
-                    // set a rule for unsuccessful upload
-
+            try {
+                const response = await axios.post(
+                    "/api/user/profile-pic.json",
+                    profilePicture
+                );
+                if (!response.data.error) {
+                    console.log("Upload Post received:", response);
                     this.setState({
                         loading: false,
                     });
-                    console.log("error in Upload Post:", err);
+                    this.props.setProfilePicUrl(response.data.url);
+                } else {
+                    // TODO set a rule for unsuccessful upload
+                }
+            } catch (err) {
+                this.setState({
+                    loading: false,
                 });
+                console.log("error in Upload Post:", err);
+            }
         } else {
             console.log("no file selected!");
         }

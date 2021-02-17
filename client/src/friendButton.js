@@ -7,28 +7,24 @@ export default function FriendButton(props) {
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const request = function () {
-        setLoading(true);
-        console.log(loading);
-        axios
-            .post("/api/user/friendBtn.json", {
+    const request = async function () {
+        try {
+            setLoading(true);
+            const result = await axios.post("/api/user/friendBtn.json", {
                 friendId: props.friendId,
                 action: btnText,
-            })
-            .then((result) => {
-                setBtnText(result.data.text);
-                setLoading(false);
-                if (result.data.error) {
-                    setError(true);
-                } else {
-                    setError(false);
-                }
-                console.log(loading);
-            })
-            .catch((err) => {
-                setLoading(false);
-                setError(true);
             });
+            setBtnText(result.data.text);
+            setLoading(false);
+            if (result.data.error) {
+                setError(true);
+            } else {
+                setError(false);
+            }
+        } catch (err) {
+            setLoading(false);
+            setError(true);
+        }
     };
 
     useEffect(() => {

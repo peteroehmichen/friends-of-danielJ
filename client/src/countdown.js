@@ -1,5 +1,6 @@
 import React from "react";
-
+// TODO could set a flexible color on countdown
+// TODO could define red after 90% or so
 // needs to receive a timestamp in miliseconds to countdown to.
 export default class Countdown extends React.Component {
     constructor(props) {

@@ -30,23 +30,19 @@ export default class App extends React.Component {
         // this.render = this.render.bind(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         // console.log("running a axios request...");
-        axios
-            .get("/api/user/data.json?id=0")
-            .then((result) => {
-                // console.log("received from /user:", result);
-                this.setState({
-                    first: result.data.first,
-                    last: result.data.last,
-                    bio: result.data.bio,
-                    profilePicUrl:
-                        result.data.profilePicUrl || "/default_user.svg",
-                });
-            })
-            .catch((err) => {
-                console.log("received an error on /user:", err);
+        try {
+            const result = await axios.get("/api/user/data.json?id=0");
+            this.setState({
+                first: result.data.first,
+                last: result.data.last,
+                bio: result.data.bio,
+                profilePicUrl: result.data.profilePicUrl || "/default_user.svg",
             });
+        } catch (err) {
+            console.log("received an error on /user:", err);
+        }
     }
 
     toggleUploadModal() {
@@ -74,13 +70,7 @@ export default class App extends React.Component {
 
     render() {
         document.querySelector("main").style.backgroundImage = "none";
-        // if (!this.state.first) {
-        //     return (
-        //         <div className="app-frame">
-        //             <Spinner />
-        //         </div>
-        //     );
-        // }
+
         return (
             <BrowserRouter>
                 <div className="app-frame debug-black">
