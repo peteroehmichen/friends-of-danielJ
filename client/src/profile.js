@@ -1,4 +1,6 @@
+import { useState } from "react";
 import BioEditor from "./bioEditor";
+import { Spinner } from "./helpers";
 import ProfilePic from "./profilePic";
 
 export default function Profile(props) {
@@ -10,6 +12,7 @@ export default function Profile(props) {
         setBio,
         toggleUploadModal,
     } = props;
+
     // console.log("Props in Profile:", props);
     return (
         <div className="main-view own-profile debug-orange">

@@ -110,7 +110,7 @@ export default class Uploader extends React.Component {
                         key={4}
                     />
                     <label htmlFor="file">
-                        <img src="upload_white.svg" />
+                        <img src="/upload_white.svg" />
                         <span>{this.state.filename}</span>
                     </label>
                     {button}

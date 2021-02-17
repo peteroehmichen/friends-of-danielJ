@@ -1,41 +1,52 @@
 import axios from "./axios";
 import { useState, useEffect } from "react";
+import { Spinner } from "./helpers";
 
 export default function FriendButton(props) {
     const [btnText, setBtnText] = useState("");
+    const [error, setError] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        // console.log("initializing BTN for", props.friendId);
+    const request = function () {
+        setLoading(true);
+        console.log(loading);
         axios
             .post("/api/user/friendBtn.json", {
                 friendId: props.friendId,
                 action: btnText,
             })
             .then((result) => {
-                // console.log("answer from Friend-Button:", result);
                 setBtnText(result.data.text);
+                setLoading(false);
+                if (result.data.error) {
+                    setError(true);
+                } else {
+                    setError(false);
+                }
+                console.log(loading);
             })
             .catch((err) => {
-                console.log("friend-error:", err);
+                setLoading(false);
+                setError(true);
             });
+    };
+
+    useEffect(() => {
+        request();
     }, []);
 
     const clickHandler = (e) => {
         e.preventDefault();
-        // console.log("Hello");
-        axios
-            .post("/api/user/friendBtn.json", {
-                friendId: props.friendId,
-                action: btnText,
-            })
-            .then((result) => {
-                // console.log("answer from Friend-Button:", result);
-                setBtnText(result.data.text);
-            })
-            .catch((err) => {
-                console.log("friend-error:", err);
-            });
+        request();
     };
 
-    return <button onClick={clickHandler}>{btnText}</button>;
+    return (
+        <button
+            className={(error && "error-btn") || " "}
+            onClick={clickHandler}
+            disabled={loading}
+        >
+            {loading ? <Spinner /> : btnText}
+        </button>
+    );
 }

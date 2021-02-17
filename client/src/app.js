@@ -8,8 +8,10 @@ import Profile from "./profile";
 import OtherProfile from "./otherProfile";
 import BioEditor from "./bioEditor";
 import FindFriends from "./findFriends";
+import { Spinner } from "./helpers";
 
-// still need to handle error messages...
+// TODO still need to handle error messages...
+// TODO create an effective loading spinner for full pages
 
 export default class App extends React.Component {
     constructor(props) {
@@ -72,6 +74,13 @@ export default class App extends React.Component {
 
     render() {
         document.querySelector("main").style.backgroundImage = "none";
+        // if (!this.state.first) {
+        //     return (
+        //         <div className="app-frame">
+        //             <Spinner />
+        //         </div>
+        //     );
+        // }
         return (
             <BrowserRouter>
                 <div className="app-frame debug-black">
@@ -85,7 +94,7 @@ export default class App extends React.Component {
                         <Logo />
                         <a href="/logout">
                             <img
-                                src="logOut.svg"
+                                src="/logOut.svg"
                                 alt="Log Out"
                                 className="logout-icon"
                             />

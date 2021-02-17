@@ -123,7 +123,11 @@ export default class PasswordReset extends React.Component {
                     />
                     <button
                         className={(this.state.error && "error-btn") || " "}
-                        disabled={!this.state.email || this.state.error}
+                        disabled={
+                            !this.state.email ||
+                            this.state.error ||
+                            this.state.loading
+                        }
                         onClick={() => this.submitReset()}
                     >
                         {this.state.error ? (
@@ -161,7 +165,11 @@ export default class PasswordReset extends React.Component {
                     />
                     <button
                         className={(this.state.error && "error-btn") || " "}
-                        disabled={!this.state.code || !this.state.password}
+                        disabled={
+                            !this.state.code ||
+                            !this.state.password ||
+                            this.state.loading
+                        }
                         onClick={() => this.submitCode()}
                     >
                         {this.state.error ? (

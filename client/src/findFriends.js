@@ -71,34 +71,37 @@ export default function FindFriends(props) {
                             name.search(regex) + searchInput.length
                         );
                         name = (
-                            <p>
+                            <h2>
                                 {one}
-                                <strong>{tag}</strong>
+                                <u>{tag}</u>
                                 {rest}
-                            </p>
+                            </h2>
                         );
 
                         return (
                             <div key={index} className="found-friend">
                                 <div className="friend-pic-small">
-                                    <Link to={`/user/${elem.id}`}>
-                                        <img
-                                            src={elem.profile_pic_url}
-                                            alt="thumbnail"
-                                            onError={(e) => {
-                                                e.target.setAttribute(
-                                                    "src",
-                                                    "default_user.svg"
-                                                );
-                                            }}
-                                        />
-                                    </Link>
+                                    <img
+                                        src={
+                                            elem.profile_pic_url ||
+                                            "/default_user.svg"
+                                        }
+                                        alt="thumbnail"
+                                        onError={(e) => {
+                                            e.target.setAttribute(
+                                                "src",
+                                                "/default_user.svg"
+                                            );
+                                        }}
+                                    />
                                 </div>
                                 <div className="friend-summary">
-                                    <h4>
-                                        {elem.first} {elem.last}
-                                    </h4>
-                                    {name}
+                                    <div className="friend-name">{name}</div>
+                                    <div className="friend-functions">
+                                        <Link to={`/user/${elem.id}`}>
+                                            View profile
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
                         );

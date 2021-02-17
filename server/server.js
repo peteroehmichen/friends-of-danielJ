@@ -158,7 +158,6 @@ app.get("/api/user/data.json", async (req, res) => {
 });
 
 app.post("/api/user/friendBtn.json", async (req, res) => {
-    // console.log("received:", req.body);
     try {
         if (req.body.action == "") {
             const { rows } = await db.getFriendInfo(
@@ -168,51 +167,47 @@ app.post("/api/user/friendBtn.json", async (req, res) => {
             // console.log("DB-Results", rows);
             if (rows.length == 0) {
                 return res.json({ text: "Send Friend Request" });
-            } else {
-                if (rows[0].confirmed) {
-                    return res.json({ text: "Cancel Friendship" });
-                } else {
-                    if (rows[0].sender == req.session.userId) {
-                        return res.json({ text: "Cancel Request" });
-                    } else if (rows[0].recipient == req.session.userId) {
-                        return res.json({ text: "Accept Request" });
-                    }
-                }
             }
-        } else if (req.body.action == "Send Friend Request") {
+            if (rows[0].confirmed) {
+                return res.json({ text: "Cancel Friendship" });
+            }
+            if (rows[0].sender == req.session.userId) {
+                return res.json({ text: "Cancel Request" });
+            }
+            return res.json({ text: "Accept Request" });
+        }
+
+        if (req.body.action == "Send Friend Request") {
             const { rowCount } = await db.safeFriendRequest(
                 req.session.userId,
                 req.body.friendId
             );
-            // console.log("DB from Safe", rowCount);
             if (rowCount > 0) {
                 return res.json({ text: "Cancel Request" });
-            } else {
-                return res.json({ text: "Error" });
             }
-        } else if (req.body.action == "Cancel Request") {
+        }
+
+        if (req.body.action == "Cancel Request") {
             const { rowCount } = await db.deleteFriendRequest(
                 req.session.userId,
                 req.body.friendId
             );
-            // console.log("DB from Cancel", rowCount);
             if (rowCount > 0) {
                 return res.json({ text: "Send Friend Request" });
-            } else {
-                return res.json({ text: "Error" });
             }
-        } else if (req.body.action == "Accept Request") {
+        }
+
+        if (req.body.action == "Accept Request") {
             const { rowCount } = await db.confirmFriendRequest(
                 req.session.userId,
                 req.body.friendId
             );
-            // console.log("DB from Confirm", rowCount);
             if (rowCount > 0) {
                 return res.json({ text: "Cancel Friendship" });
-            } else {
-                return res.json({ text: "Error" });
             }
-        } else if (req.body.action == "Cancel Friendship") {
+        }
+
+        if (req.body.action == "Cancel Friendship") {
             const { rowCount } = await db.deleteFriendship(
                 req.session.userId,
                 req.body.friendId
@@ -220,36 +215,24 @@ app.post("/api/user/friendBtn.json", async (req, res) => {
             // console.log("DB from Cancel", rowCount);
             if (rowCount > 0) {
                 return res.json({ text: "Send Friend Request" });
-            } else {
-                return res.json({ text: "Error" });
             }
         }
+
+        return res.json({
+            text: "Internal error - please try again later",
+            error: true,
+        });
     } catch (error) {
-        res.json({ text: "ERROR" });
+        return res.json({
+            text: "Server error - please try again later",
+            error: true,
+        });
     }
 });
-/*
-    if req.body.action is "" then 
-        check status of friendships
-        if there is no relation, then 
-            respond with "Send Friend Request"
-        else
-            investigate relationship further
-            if true then 
-                respond with Delete Friendship
-            else
-                if sender is userID then
-                    respond with "cancel"
-                else
-                    respond with "accept"
-    else
-        STILL TO DO
-
-    */
 
 app.get("/api/findUsers.json", async (req, res) => {
     const { search } = req.query;
-    // console.log("req.body in Finder:", search);
+    console.log("req.body in Finder:", req.query);
     let result;
     try {
         if (search) {

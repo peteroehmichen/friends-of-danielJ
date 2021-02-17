@@ -35,12 +35,10 @@ module.exports.getAuthenticatedUser = async function (email, password) {
             );
             if (confirmPw) {
                 return result.rows[0];
-            } else {
-                return { error: "Wrong Password" };
             }
-        } else {
-            return { error: "User not found" };
+            return { error: "Wrong Password" };
         }
+        return { error: "User not found" };
     } catch (err) {
         return { error: "Error in DB" };
     }
@@ -98,13 +96,10 @@ module.exports.confirmCode = async function (code, validity, email) {
             [email]
         );
         if (result.rowCount > 0) {
-            // console.log(result.rows[0].code);
             return result.rows[0].code == code;
-        } else {
-            return false;
         }
+        return false;
     } catch (err) {
-        console.log("error in searching code in db:", err);
         return err;
     }
 };

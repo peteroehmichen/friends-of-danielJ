@@ -33,8 +33,7 @@ export default class OtherProfile extends React.Component {
                     this.setState({
                         first: data.first,
                         last: data.last,
-                        profilePicUrl:
-                            data.profilePicUrl || "/default_user.svg",
+                        profilePicUrl: data.profilePicUrl || "/default_user.svg",
                         bio: data.bio,
                         error: false,
                     });

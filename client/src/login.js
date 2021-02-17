@@ -82,7 +82,8 @@ export default class Login extends React.Component {
                         disabled={
                             !this.state.email ||
                             !this.state.password ||
-                            this.state.error
+                            this.state.error ||
+                            this.state.loading
                         }
                         onClick={() => this.submitHandler()}
                     >
