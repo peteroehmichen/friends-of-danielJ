@@ -157,6 +157,17 @@ app.get("/api/user/data.json", async (req, res) => {
     }
 });
 
+app.get("/api/friends.json", async (req, res) => {
+    console.log("fetching friends for user:", req.session.userId);
+    try {
+        const { rows } = await db.getAllRelations(req.session.userId);
+        res.json(rows);
+    } catch (error) {
+        console.log("error in fetching friends:", error);
+        res.json({ error: "Error in Loading Friends" });
+    }
+});
+
 app.post("/api/user/friendBtn.json", async (req, res) => {
     try {
         if (req.body.action == "") {
@@ -207,7 +218,10 @@ app.post("/api/user/friendBtn.json", async (req, res) => {
             }
         }
 
-        if (req.body.action == "Cancel Friendship") {
+        if (
+            req.body.action == "Cancel Friendship" ||
+            req.body.action == "Deny Request"
+        ) {
             const { rowCount } = await db.deleteFriendship(
                 req.session.userId,
                 req.body.friendId

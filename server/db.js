@@ -138,3 +138,10 @@ module.exports.getFriendInfo = function (userId, friendId) {
         [userId, friendId]
     );
 };
+
+module.exports.getAllRelations = function (userId) {
+    return sql.query(
+        `SELECT users.id, first, last, profile_pic_url, sender, recipient, confirmed FROM friendships JOIN users ON (recipient = $1 AND sender = users.id) OR (sender = $1 AND recipient = users.id);`,
+        [userId]
+    );
+};

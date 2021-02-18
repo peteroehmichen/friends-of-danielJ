@@ -9,6 +9,7 @@ import OtherProfile from "./otherProfile";
 import BioEditor from "./bioEditor";
 import FindFriends from "./findFriends";
 import { Spinner } from "./helpers";
+import Friends from "./friends";
 
 // TODO still need to handle error messages...
 // TODO create an effective loading spinner for full pages
@@ -94,6 +95,9 @@ export default class App extends React.Component {
                         <Link to="/">
                             <div className="nav-element">own Profile</div>
                         </Link>
+                        <Link to="/friends">
+                            <div className="nav-element">Friend & Requests</div>
+                        </Link>
                         <Link to="/users">
                             <div className="nav-element">find Friends</div>
                         </Link>
@@ -119,6 +123,7 @@ export default class App extends React.Component {
                                 />
                             )}
                         />
+                        <Route path="/friends" render={() => <Friends />} />
                         <Route path="/users" render={() => <FindFriends />} />
                         <Route
                             path="/user/:id"
