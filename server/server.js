@@ -158,7 +158,7 @@ app.get("/api/user/data.json", async (req, res) => {
 });
 
 app.get("/api/friends.json", async (req, res) => {
-    console.log("fetching friends for user:", req.session.userId);
+    // console.log("fetching friends for user:", req.session.userId);
     try {
         const { rows } = await db.getAllRelations(req.session.userId);
         res.json(rows);
