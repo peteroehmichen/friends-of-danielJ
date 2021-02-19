@@ -1,6 +1,5 @@
 export default function reducer(store = {}, action) {
     if (action.type == "GET_ALL_RELATIONS") {
-        //
         store = {
             ...store,
             relations: action.payload,
@@ -8,7 +7,6 @@ export default function reducer(store = {}, action) {
     }
 
     if (action.type == "CANCEL_FRIENDSHIP") {
-        //
         store = {
             ...store,
             relations: store.relations.filter(
@@ -18,7 +16,6 @@ export default function reducer(store = {}, action) {
     }
 
     if (action.type == "ACCEPT_REQUEST") {
-        //
         store = {
             ...store,
             relations: store.relations.map((user) => {
@@ -35,7 +32,6 @@ export default function reducer(store = {}, action) {
     }
 
     if (action.type == "CANCEL_REQUEST") {
-        //
         store = {
             ...store,
             relations: store.relations.filter(
@@ -45,7 +41,6 @@ export default function reducer(store = {}, action) {
     }
 
     if (action.type == "DENY_REQUEST") {
-        //
         store = {
             ...store,
             relations: store.relations.filter(

@@ -8,11 +8,10 @@ import {
     getList,
     unfriend,
 } from "./action";
+import Countdown from "./countdown";
 import { jsXListedItems } from "./helpers";
 
-// TODO error handling
-
-export default function Friends() {
+export default function Friends(props) {
     const dispatch = useDispatch();
     const all = useSelector((store) => store.relations);
 
@@ -24,9 +23,13 @@ export default function Friends() {
     let friends = <div>There are none</div>;
     let requests;
     let pending;
+    let error;
 
     if (!all) {
         return null;
+    } else if (all.error) {
+        console.log("We hit an error:", all.error);
+        error = all.error;
     } else if (all.length > 0) {
         friends = all.filter((elem) => elem.confirmed);
         requests = all.filter(
@@ -85,10 +88,25 @@ export default function Friends() {
 
     return (
         <div className="main-view friends debug-green">
-            <div className="friends-list">
-                <h2>Your Friends</h2>
-                <div className="friends-list-body">{friends}</div>
-            </div>
+            {error && (
+                <div className="friends-error">
+                    <h2>{error}</h2>
+                    <h4>
+                        Automatically redirecting you to Start-Page in
+                        <Countdown
+                            deadline={Date.now() + 5000}
+                            actionOnEnd={() => props.history.push("/")}
+                        />
+                        seconds
+                    </h4>
+                </div>
+            )}
+            {!error && (
+                <div className="friends-list">
+                    <h2>Your Friends</h2>
+                    <div className="friends-list-body">{friends}</div>
+                </div>
+            )}
             {requests && requests.length > 0 && (
                 <div className="friends-list">
                     <h2>Friend-Requests awaiting your answer</h2>

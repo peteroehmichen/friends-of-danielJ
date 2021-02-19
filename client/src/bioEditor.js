@@ -1,6 +1,7 @@
 import axios from "./axios";
 import { Spinner } from "./helpers";
 import React from "react";
+import Countdown from "./countdown";
 
 export default class BioEditor extends React.Component {
     constructor(props) {
@@ -75,7 +76,13 @@ export default class BioEditor extends React.Component {
                 <Spinner />
             </button>
         ) : (
-            <button onClick={this.saveBio}>Save Bio</button>
+            <button
+                className={(this.state.error && "error-btn") || " "}
+                onClick={this.saveBio}
+                disabled={this.state.error}
+            >
+                {this.state.error ? this.state.error : "Save Bio"}
+            </button>
         );
         let on = (
             <div>
@@ -84,9 +91,6 @@ export default class BioEditor extends React.Component {
                     onChange={this.handleChange}
                 />
                 {waitButton}
-                <div className="error">
-                    {this.state.error && <p>{this.state.error}</p>}
-                </div>
             </div>
         );
         return (

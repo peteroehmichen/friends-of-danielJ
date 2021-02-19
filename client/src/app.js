@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Route, Link } from "react-router-dom";
+
 import Uploader from "./uploader";
 import Logo from "./logo";
 import ProfilePic from "./profilePic";
@@ -10,8 +11,9 @@ import BioEditor from "./bioEditor";
 import FindFriends from "./findFriends";
 import { Spinner } from "./helpers";
 import Friends from "./friends";
+import Countdown from "./countdown";
 
-// TODO still need to handle error messages...
+// FIXME on db-error in bio and sub-elements full reload /.
 // TODO create an effective loading spinner for full pages
 
 export default class App extends React.Component {
@@ -40,9 +42,13 @@ export default class App extends React.Component {
                 last: result.data.last,
                 bio: result.data.bio,
                 profilePicUrl: result.data.profilePicUrl || "/default_user.svg",
+                error: result.data.error,
             });
         } catch (err) {
-            console.log("received an error on /user:", err);
+            console.log("Received an error on /user:", err);
+            this.setState({
+                error: "No Connection to Database",
+            });
         }
     }
 
@@ -75,6 +81,27 @@ export default class App extends React.Component {
         return (
             <BrowserRouter>
                 <div className="app-frame debug-black">
+                    {this.state.error && (
+                        <div className="overlay">
+                            <div className="uploader">
+                                <img
+                                    className="errorGIF"
+                                    src="https://media.giphy.com/media/m2hjlbNbSRGy4/giphy.gif"
+                                />
+                                <h2>{this.state.error}</h2>
+                                <p>
+                                    Logging Out in{" "}
+                                    <Countdown
+                                        deadline={Date.now() + 10000}
+                                        actionOnEnd={() =>
+                                            location.replace("/logout")
+                                        }
+                                    />
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="header debug-red">
                         <ProfilePic
                             first={this.state.first}
@@ -112,7 +139,7 @@ export default class App extends React.Component {
                         <Route
                             exact
                             path="/"
-                            render={() => (
+                            render={(props) => (
                                 <Profile
                                     first={this.state.first}
                                     last={this.state.last}
@@ -123,8 +150,18 @@ export default class App extends React.Component {
                                 />
                             )}
                         />
-                        <Route path="/friends" render={() => <Friends />} />
-                        <Route path="/users" render={() => <FindFriends />} />
+                        <Route
+                            path="/friends"
+                            render={(props) => (
+                                <Friends history={props.history} />
+                            )}
+                        />
+                        <Route
+                            path="/users"
+                            render={(props) => (
+                                <FindFriends history={props.history} />
+                            )}
+                        />
                         <Route
                             path="/user/:id"
                             render={(props) => (

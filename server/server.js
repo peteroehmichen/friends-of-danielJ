@@ -1,5 +1,11 @@
 const express = require("express");
 const app = express();
+const server = require("http").Server(app);
+const io = require("socket.io")(server, {
+    allowRequest: (req, callback) =>
+        callback(null, req.headers.referer.startsWith("http://localhost:3000")),
+});
+
 const compression = require("compression");
 const path = require("path");
 const cookieSession = require("cookie-session");
@@ -57,17 +63,18 @@ app.post("/api/registration.json", async (req, res) => {
         const hashedPw = await auth.hash(password);
         const result = await db.addUser(first, last, email, hashedPw);
         req.session.userId = result.rows[0].id;
-        res.json(result.rows[0]);
+        res.json({ status: "OK" });
     } catch (err) {
         if (err.code == "23505") {
             res.json({ error: "E-Mail already exists" });
         } else {
-            res.json({ error: "Unknown error" });
+            res.json({ error: "Server error" });
         }
     }
 });
 
 app.post("/api/login.json", async (req, res) => {
+    console.log("new receive:", req.body);
     try {
         const result = await db.getAuthenticatedUser(
             req.body.email,
@@ -76,11 +83,15 @@ app.post("/api/login.json", async (req, res) => {
         if (result.id) {
             req.session.userId = result.id;
             res.json({
-                first: result.first,
-                last: result.last,
+                status: "OK",
             });
         } else {
-            res.json({ error: "Invalid user credentials" });
+            console.log(result);
+            if (result.error == "Error in DB") {
+                res.json({ error: "No Connection" });
+            } else {
+                res.json({ error: "Invalid user credentials" });
+            }
         }
     } catch (err) {
         res.json({ error: "Log in rejected" });
@@ -150,10 +161,10 @@ app.get("/api/user/data.json", async (req, res) => {
                 bio: result.rows[0].bio,
             });
         } else {
-            res.json({ error: "Unknown user" });
+            res.json({ error: "User unkown - please log in again" });
         }
     } catch (err) {
-        res.json({ error: "Error in database" });
+        res.json({ error: "Failed Connection to Database" });
     }
 });
 
@@ -266,10 +277,10 @@ app.get("/api/findUsers.json", async (req, res) => {
                 result: result.rows,
             });
         } else {
-            res.json({ error: "no users found" });
+            res.json({ empty: "no users found" });
         }
     } catch (err) {
-        res.json({ error: "Problem in DB" });
+        res.json({ error: "Problem in connecting to Database" });
     }
 });
 
@@ -289,7 +300,7 @@ app.post(
                 res.json({ error: "DB rejected new picture" });
             }
         } catch (error) {
-            res.json({ error: "Upload failed" });
+            res.json({ error: "Upload failed - try again later" });
         }
     }
 );
@@ -300,10 +311,10 @@ app.post("/api/profile-bio.json", async (req, res) => {
         if (result.rowCount > 0) {
             res.json({ update: "success" });
         } else {
-            res.json({ error: "Could not write to DB" });
+            res.json({ error: "Could not write to Database" });
         }
     } catch (err) {
-        res.json({ error: "DB rejected Bio" });
+        res.json({ error: "Failed Connection to Database" });
     }
 });
 
@@ -320,6 +331,10 @@ app.get("*", function (req, res) {
     }
 });
 
-app.listen(process.env.PORT || 3001, function () {
+server.listen(process.env.PORT || 3001, function () {
     console.log("I'm listening.");
 });
+
+// io.on("connection", (socket) => {
+//     console.log("Socket got connected:", socket.id);
+// });

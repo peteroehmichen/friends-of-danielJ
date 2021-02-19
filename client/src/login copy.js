@@ -1,66 +1,16 @@
+import React from "react";
 import { Link } from "react-router-dom";
-import { Spinner, useAthenticate, useFormEval } from "./helpers";
+import axios from "./axios";
+import { formEval, Spinner } from "./helpers";
 
-export default function Login() {
-    const [values, handleChangeEval] = useFormEval();
-    const [status, handleAuthSubmit] = useAthenticate(
-        "/api/login.json",
-        values
-    );
-
-    return (
-        <div className="welcome-blocks login">
-            <div className="title">
-                <h3>please log in with your email address</h3>
-            </div>
-            <div className="form">
-                <input
-                    onChange={handleChangeEval}
-                    type="email"
-                    name="email"
-                    placeholder="E-Mail"
-                />
-                <input
-                    onChange={handleChangeEval}
-                    type="password"
-                    name="password"
-                    placeholder="password"
-                />
-                <button
-                    className={(status.error && "error-btn") || " "}
-                    disabled={
-                        !values.email ||
-                        !values.password ||
-                        status.error ||
-                        status.loading
-                    }
-                    onClick={handleAuthSubmit}
-                >
-                    {status.error ? (
-                        status.error
-                    ) : status.loading ? (
-                        <Spinner />
-                    ) : (
-                        "Log In"
-                    )}
-                </button>
-            </div>
-            <div className="welcome-footnote">
-                <p>
-                    Not yet a user? Click here to <Link to="/">register</Link>
-                </p>
-                <p>
-                    Forgot your password? Click here to{" "}
-                    <Link to="/reset">reset</Link>
-                </p>
-            </div>
-        </div>
-    );
-}
-
-/*
 export default class Login extends React.Component {
-
+    constructor(props) {
+        super(props);
+        this.state = {
+            error: false,
+            loading: false,
+        };
+    }
 
     changeHandler(e) {
         const passedValue = formEval(e);
@@ -154,4 +104,3 @@ export default class Login extends React.Component {
         );
     }
 }
-*/

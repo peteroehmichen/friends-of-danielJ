@@ -1,4 +1,4 @@
-import { HashRouter, Route, Link } from "react-router-dom";
+import { HashRouter, Route } from "react-router-dom";
 import { Fragment } from "react";
 import Registration from "./registration";
 import Login from "./login";
