@@ -7,13 +7,11 @@ export default function ProfilePic(props) {
         <img
             src={props.profilePicUrl}
             alt={props.first}
-            className={`profile-picture debug-green ${props.size}`}
-            onClick={props.toggleUploadModal}
+            className={`profile-picture ${props.size}`}
+            onClick={
+                (props.size == "large" && props.toggleUploadModal) ||
+                function () {}
+            }
         />
     );
 }
-
-/* 
-display the pictureURL and name of profile from props
-
-*/

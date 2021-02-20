@@ -49,8 +49,15 @@ module.exports.getUserByEmail = function getUserByEmail(email) {
 };
 
 module.exports.getUserById = function getUserByEmail(id) {
-    return sql.query(`SELECT * FROM users WHERE id=$1`, [id]);
+    // console.log("Big request with", id);
+    return sql.query(
+        `WITH temp AS (SELECT COUNT(*) AS total, ${id} AS user FROM friendships WHERE (sender = ${id} AND confirmed = true) OR (recipient = ${id} AND confirmed = true)) SELECT * FROM users JOIN temp ON users.id = temp.user;`
+    );
 };
+
+// module.exports.getUserById = function getUserByEmail(id) {
+//     return sql.query(`SELECT * FROM users WHERE id=$1`, [id]);
+// };
 
 module.exports.getUserByTextSearch = async function (text, userId) {
     const tag = text.length > 1 ? `%${text}%` : `${text}%`;

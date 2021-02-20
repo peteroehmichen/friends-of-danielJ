@@ -41,26 +41,36 @@ a {
     /* text-transform: uppercase; */
     color: inherit;
     font-weight: bold;
+    text-decoration: none;
 }
 
 p {
     padding: 5px 5px 15px 5px;
 }
 
-.logo {
-    width: 100px;
-    height: 100px;
-    position: absolute;
-    top: 10px;
-    left: 10px;
+textarea {
+    font-size: 1.1em;
+    font-family: Arial, Helvetica, sans-serif;
+    width: 300px;
+    height: 160px;
 }
 
 .logo-nav {
-    width: 100px;
+    max-width: 50%;
     height: 100px;
     position: static;
     top: 10px;
     left: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.logo-nav img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
 }
 
 .welcome {
@@ -136,12 +146,50 @@ input[type="email"] {
 }
 
 .header {
+    position: relative;
     width: 100%;
     height: 120px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    padding: 10px 20px 0;
+    overflow: hidden;
+}
+
+.header-right {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100%;
+    top: 0;
+    right: -50px;
+    transition: transform 1s;
+}
+
+.header-right:hover {
+    transform: translateX(-50px);
+}
+
+.header-nav {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: flex-end;
+    padding: 0 20px;
+}
+
+.header-nav img {
+    height: 30px;
+    width: 30px;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+.logout-icon {
+    height: 25px;
 }
 
 .nav-bar {
@@ -151,12 +199,20 @@ input[type="email"] {
     flex-direction: row;
     justify-content: space-evenly;
     align-items: center;
+    border-bottom: 7px solid green;
+    padding-top: 20px;
 }
 
 .nav-element {
     width: 150px;
     height: 30px;
-    border: 1px solid black;
+    /* border: 1px solid black; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: green;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
     /* border-radius: 10px; */
 }
 
@@ -191,6 +247,7 @@ input[type="email"] {
     border-radius: 15px;
     overflow: hidden;
     padding: 30px;
+    padding-top: 0;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -204,6 +261,56 @@ input[type="email"] {
     margin: 10px;
 }
 
+.uploader-head {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.uploader-body {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+.pane {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+}
+
+.one {
+    z-index: 5;
+    height: 1px;
+    background-color: #fff;
+}
+
+.one > button {
+    color: red;
+}
+
+.two {
+    background-color: burlywood;
+    padding-top: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.slider {
+    top: 1px;
+    left: 0;
+    width: 100%;
+    height: 12px;
+    background-color: black;
+    z-index: 5;
+}
+
 .errorGIF {
     width: 250px;
     height: 250px;
@@ -214,13 +321,21 @@ input[type="email"] {
     position: relative;
     width: 100%;
     height: 100%;
+    padding: 15px;
     overflow: hidden;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
-.logout-icon {
-    height: 30px;
+.profile-information {
+    padding-left: 20px;
+    width: 400px;
+    max-height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 
 #searchFriend {
@@ -412,10 +527,12 @@ button {
     width: 250px;
     height: 250px;
     border-radius: 15px;
+    cursor: pointer;
 }
 
 .bio {
     position: relative;
+    padding: 10px 0;
 }
 
 .lowTimer {

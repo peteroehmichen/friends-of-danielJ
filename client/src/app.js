@@ -24,6 +24,8 @@ export default class App extends React.Component {
             last: "",
             email: "",
             bio: "",
+            total: "",
+            userSince: "",
             profilePicUrl: "",
             activateUploadModal: false,
         };
@@ -42,6 +44,8 @@ export default class App extends React.Component {
                 last: result.data.last,
                 bio: result.data.bio,
                 profilePicUrl: result.data.profilePicUrl || "/default_user.svg",
+                total: result.data.total,
+                userSince: result.data.created_at,
                 error: result.data.error,
             });
         } catch (err) {
@@ -102,21 +106,29 @@ export default class App extends React.Component {
                         </div>
                     )}
 
-                    <div className="header debug-red">
-                        <ProfilePic
-                            first={this.state.first}
-                            profilePicUrl={this.state.profilePicUrl}
-                            size="small"
-                            toggleUploadModal={this.toggleUploadModal}
-                        />
+                    <div className="header">
                         <Logo />
-                        <a href="/logout">
-                            <img
-                                src="/logOut.svg"
-                                alt="Log Out"
-                                className="logout-icon"
+                        <div className="header-right">
+                            <ProfilePic
+                                first={this.state.first}
+                                profilePicUrl={this.state.profilePicUrl}
+                                size="small"
+                                toggleUploadModal={this.toggleUploadModal}
                             />
-                        </a>
+                            <div className="header-nav">
+                                <a href="/logout">
+                                    <img
+                                        src="/logOut.svg"
+                                        alt="Log Out"
+                                        className="logout-icon"
+                                    />
+                                </a>
+                                <img
+                                    src="/settings.svg"
+                                    onClick={this.toggleUploadModal}
+                                />
+                            </div>
+                        </div>
                     </div>
                     <div className="nav-bar">
                         <Link to="/">
@@ -134,6 +146,8 @@ export default class App extends React.Component {
                             <Uploader
                                 toggleUploadModal={this.toggleUploadModal}
                                 setProfilePicUrl={this.setProfilePicUrl}
+                                numberOfFriends={this.state.total}
+                                userSince={this.state.userSince}
                             />
                         )}
                         <Route

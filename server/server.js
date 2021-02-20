@@ -147,23 +147,28 @@ app.post("/api/password/code.json", async (req, res) => {
 });
 
 app.get("/api/user/data.json", async (req, res) => {
+    // console.log("receiving:", req.query);
     if (req.query.id == req.session.userId) {
         return res.json({ error: "Cannot display YOU" });
     }
     const idForDb = req.query.id == 0 ? req.session.userId : req.query.id;
     try {
         const result = await db.getUserById(idForDb);
+        // console.log("checking:", result);
         if (result.rowCount > 0) {
             return res.json({
                 first: result.rows[0].first,
                 last: result.rows[0].last,
                 profilePicUrl: result.rows[0].profile_pic_url,
                 bio: result.rows[0].bio,
+                total: result.rows[0].total,
+                created_at: result.rows[0].created_at,
             });
         } else {
             res.json({ error: "User unkown - please log in again" });
         }
     } catch (err) {
+        // console.log("checking2:", err);
         res.json({ error: "Failed Connection to Database" });
     }
 });

@@ -60,6 +60,8 @@ export function useFormEval() {
     const [values, setValues] = useState({});
 
     const handleChangeEval = (e) => {
+        const emailFormat = new RegExp("^[^@]+@[^@]+.[^@]+$", "gi");
+
         e.target.style.borderBottom = "3px solid orangered";
 
         let value = e.target.value;
@@ -68,10 +70,16 @@ export function useFormEval() {
         }
         if (
             e.target.attributes.type.value == "email" &&
-            !e.target.value.includes("@")
+            !emailFormat.test(e.target.value)
         ) {
             value = false;
         }
+        // if (
+        //     e.target.attributes.type.value == "email" &&
+        //     !e.target.value.includes("@")
+        // ) {
+        //     value = false;
+        // }
 
         if (value) {
             setValues({
