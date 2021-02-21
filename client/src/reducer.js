@@ -49,5 +49,54 @@ export default function reducer(store = {}, action) {
         };
     }
 
+    if (action.type == "FULL_USER_DATA") {
+        if (!action.payload.profilePicUrl) {
+            action.payload.profilePicUrl = "/default_user.svg";
+        }
+        store = {
+            ...store,
+            user: action.payload,
+        };
+    }
+
+    if (action.type == "TOGGLE_UPLOAD_MODAL") {
+        store = {
+            ...store,
+            user: {
+                ...store.user,
+            },
+            activateUploadModal:
+                store.activateUploadModal == null
+                    ? true
+                    : !store.activateUploadModal,
+        };
+    }
+
+    if (action.type == "TOGGLE_BIO_EDITOR") {
+        store = {
+            ...store,
+            user: {
+                ...store.user,
+            },
+            activeBioEditor:
+                store.activeBioEditor == null ? true : !store.activeBioEditor,
+        };
+    }
+
+    if (action.type == "UPDATE_BIO") {
+        // maybe handle errors and thik about handling loading
+        store = {
+            ...store,
+            user: {
+                ...store.user,
+            },
+        };
+        if (action.payload.error) {
+            store.user.bioError = action.payload.error;
+        } else {
+            store.user.bio = action.payload;
+            store.user.bioError = null;
+        }
+    }
     return store;
 }

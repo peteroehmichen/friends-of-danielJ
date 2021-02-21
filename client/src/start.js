@@ -7,7 +7,7 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import { Provider } from "react-redux";
 
 import Welcome from "./welcome";
-import App from "./app";
+import App, { App2 } from "./app";
 import reducer from "./reducer";
 
 const store = createStore(
@@ -25,7 +25,7 @@ if (location.pathname === "/welcome") {
 } else {
     elem = (
         <Provider store={store}>
-            <App />
+            <App2 />
         </Provider>
     );
 }

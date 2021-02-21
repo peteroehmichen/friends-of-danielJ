@@ -1,7 +1,77 @@
 import axios from "./axios";
 import { Spinner } from "./helpers";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Countdown from "./countdown";
+import { useDispatch, useSelector } from "react-redux";
+import { updateBio, toggleBioEditor } from "./action";
+
+export function BioEditor2() {
+    const dispatch = useDispatch();
+    const { user, activeBioEditor } = useSelector((store) => store);
+
+    // const [activeEditor, setActiveEditor] = useState(false);
+    const [value, setValue] = useState("");
+    // const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    // console.log("Bio2:", bio);
+    if (!user.bio) return null;
+
+    if (value == "") {
+        setValue(user.bio);
+    }
+    const buttonText = user.bio ? "edit Bio" : "add Bio";
+    const off = (
+        <div>
+            <p>{user.bio}</p>
+            <button
+                onClick={() => {
+                    // console.log("opening Editor");
+                    dispatch(toggleBioEditor());
+                }}
+            >
+                {buttonText}
+            </button>
+        </div>
+    );
+    const waitButton = loading ? (
+        <button disabled={true}>
+            <Spinner />
+        </button>
+    ) : (
+        <button
+            className={(user.bioError && "error-btn") || " "}
+            onClick={async () => {
+                // console.log("Clicked with bio:", value);
+                setLoading(true);
+                await dispatch(updateBio(value));
+                setLoading(false);
+                if (!user.bioError) {
+                    dispatch(toggleBioEditor());
+                }
+            }}
+            disabled={user.bioError}
+        >
+            {user.bioError ? user.bioError : "Save Bio"}
+        </button>
+    );
+    let on = (
+        <div>
+            <textarea
+                defaultValue={value}
+                onChange={(e) => setValue(e.target.value)}
+            />
+            {waitButton}
+        </div>
+    );
+    // FIXME Error is not read immediately and stops reload!
+    return (
+        <div className="bio">
+            {(activeBioEditor && on) || off}
+            <p>Error: {user.bioError}</p>
+        </div>
+    );
+}
 
 export default class BioEditor extends React.Component {
     constructor(props) {

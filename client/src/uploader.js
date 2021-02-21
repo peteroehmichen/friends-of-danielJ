@@ -111,6 +111,7 @@ export default class Uploader extends React.Component {
         e.preventDefault(); // console.log("schade!", e);
         if (e.target.innerHTML == "are you SURE?") {
             console.log("going to delete USER");
+            // FIXME user deletion
             location.replace("/logout");
         } else {
             this.setState({
