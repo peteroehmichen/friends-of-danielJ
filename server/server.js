@@ -8,7 +8,16 @@ const io = require("socket.io")(server, {
 
 const compression = require("compression");
 const path = require("path");
+
+let cookie_secret = process.env.cookie_secret
+    ? process.env.cookie_secret
+    : require("../secrets.json").secretOfSession;
 const cookieSession = require("cookie-session");
+const cookieSessionMiddleware = cookieSession({
+    secret: cookie_secret,
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+});
+
 const csurf = require("csurf");
 const {
     CODE_VALIDITY_IN_MINUTES,
@@ -19,16 +28,10 @@ const db = require("./db");
 const auth = require("./auth");
 const { sendEMail, uploader, uploadToAWS } = require("./aws");
 
-let cookie_secret = process.env.cookie_secret
-    ? process.env.cookie_secret
-    : require("../secrets.json").secretOfSession;
-
-app.use(
-    cookieSession({
-        secret: cookie_secret,
-        maxAge: 1000 * 60 * 60 * 24 * 7,
-    })
-);
+app.use(cookieSessionMiddleware);
+io.use(function (socket, next) {
+    cookieSessionMiddleware(socket.request, socket.request.res, next);
+});
 
 app.use(csurf());
 
@@ -186,7 +189,7 @@ app.get("/api/friends.json", async (req, res) => {
 
 app.post("/api/user/friendBtn.json", async (req, res) => {
     try {
-        if (req.body.action == "") {
+        if (req.body.task == "") {
             const { rows } = await db.getFriendInfo(
                 req.session.userId,
                 req.body.friendId
@@ -204,7 +207,7 @@ app.post("/api/user/friendBtn.json", async (req, res) => {
             return res.json({ text: "Accept Request" });
         }
 
-        if (req.body.action == "Send Friend Request") {
+        if (req.body.task == "Send Friend Request") {
             const { rowCount } = await db.safeFriendRequest(
                 req.session.userId,
                 req.body.friendId
@@ -214,7 +217,7 @@ app.post("/api/user/friendBtn.json", async (req, res) => {
             }
         }
 
-        if (req.body.action == "Cancel Request") {
+        if (req.body.task == "Cancel Request") {
             const { rowCount } = await db.deleteFriendRequest(
                 req.session.userId,
                 req.body.friendId
@@ -224,7 +227,7 @@ app.post("/api/user/friendBtn.json", async (req, res) => {
             }
         }
 
-        if (req.body.action == "Accept Request") {
+        if (req.body.task == "Accept Request") {
             const { rowCount } = await db.confirmFriendRequest(
                 req.session.userId,
                 req.body.friendId
@@ -235,8 +238,8 @@ app.post("/api/user/friendBtn.json", async (req, res) => {
         }
 
         if (
-            req.body.action == "Cancel Friendship" ||
-            req.body.action == "Deny Request"
+            req.body.task == "Cancel Friendship" ||
+            req.body.task == "Deny Request"
         ) {
             const { rowCount } = await db.deleteFriendship(
                 req.session.userId,
@@ -323,6 +326,16 @@ app.post("/api/profile-bio.json", async (req, res) => {
     }
 });
 
+app.get("/api/chat.json", async (req, res) => {
+    try {
+        const { rows } = await db.getLastChats();
+        res.json(rows);
+    } catch (error) {
+        console.log("error in loading chat:", error);
+        res.json({ error: "Error in Loading Chat" });
+    }
+});
+
 app.get("/logout", (req, res) => {
     req.session = null;
     res.redirect("/welcome");
@@ -340,6 +353,29 @@ server.listen(process.env.PORT || 3001, function () {
     console.log("I'm listening.");
 });
 
-// io.on("connection", (socket) => {
-//     console.log("Socket got connected:", socket.id);
-// });
+io.on("connection", (socket) => {
+    console.log("Socket got connected:", socket.id);
+    console.log("Socket connected to UserId:", socket.request.session.userId);
+
+    // socket.emit("Hello", { test: "this is the first transmission" });
+    // socket.on("Likewise", (obj) => {
+    //     console.log("receievd:", obj);
+    // });
+
+    socket.on("newMessage", async (msg) => {
+        // FIXME error handling
+        // console.log("received:", msg);
+        const result = await db.addNewMessage(
+            socket.request.session.userId,
+            msg
+        );
+        // console.log(result.chat.rows[0]);
+        // console.log(result.user.rows[0]);
+        io.emit("newMsg", {
+            ...result.user.rows[0],
+            ...result.chat.rows[0],
+        });
+    });
+
+    // emitting a single message to all active users
+});

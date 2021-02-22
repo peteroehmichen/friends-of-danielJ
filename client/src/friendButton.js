@@ -1,48 +1,40 @@
 import axios from "./axios";
 import { useState, useEffect } from "react";
 import { Spinner } from "./helpers";
+import { useDispatch, useSelector } from "react-redux";
+import { submitFriendAction } from "./action";
 
 export default function FriendButton(props) {
-    const [btnText, setBtnText] = useState("");
-    const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
+    const dispatch = useDispatch();
+    const { nextFriendAction, dbError } = useSelector(
+        (store) => store.otherUser
+    );
 
-    const request = async function () {
-        try {
-            setLoading(true);
-            const result = await axios.post("/api/user/friendBtn.json", {
-                friendId: props.friendId,
-                action: btnText,
-            });
-            setBtnText(result.data.text);
-            setLoading(false);
-            if (result.data.error) {
-                setError(true);
-            } else {
-                setError(false);
-            }
-        } catch (err) {
-            setLoading(false);
-            setError(true);
-        }
+    const request = async function (task) {
+        // setLoading(true);
+        dispatch(submitFriendAction(props.friendId, task));
+        // setLoading(false);
     };
 
     useEffect(() => {
-        request();
+        request("");
     }, []);
 
-    const clickHandler = (e) => {
-        e.preventDefault();
-        request();
-    };
+    // console.log("nextFriendAction:", nextFriendAction);
+    // console.log("dbError:", dbError);
+
+    if (!nextFriendAction) return null;
 
     return (
         <button
-            className={(error && "error-btn") || " "}
-            onClick={clickHandler}
+            className={(dbError && "error-btn") || " "}
+            onClick={() => {
+                request(nextFriendAction);
+            }}
             disabled={loading}
         >
-            {loading ? <Spinner /> : btnText}
+            {loading ? <Spinner /> : nextFriendAction}
         </button>
     );
 }

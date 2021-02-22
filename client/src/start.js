@@ -9,7 +9,7 @@ import { Provider } from "react-redux";
 import Welcome from "./welcome";
 import App, { App2 } from "./app";
 import reducer from "./reducer";
-
+import { init } from "./socket";
 const store = createStore(
     reducer,
     composeWithDevTools(applyMiddleware(reduxPromise))
@@ -17,12 +17,9 @@ const store = createStore(
 
 let elem;
 if (location.pathname === "/welcome") {
-    elem = (
-        <Provider store={store}>
-            <Welcome />
-        </Provider>
-    );
+    elem = <Welcome />;
 } else {
+    init(store);
     elem = (
         <Provider store={store}>
             <App2 />

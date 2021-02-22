@@ -2,7 +2,7 @@ import axios from "./axios";
 
 export async function getList() {
     const { data } = await axios.get("/api/friends.json");
-    console.log("data from server", data);
+    // console.log("data from server", data);
     return {
         type: "GET_ALL_RELATIONS",
         payload: data,
@@ -65,19 +65,21 @@ export async function cancelRequest(id) {
     }
 }
 
-export async function getUserData() {
-    console.log("Going to fetch user data:");
+export async function getUserData(id) {
+    // console.log("Going to fetch user data:");
     try {
-        const { data } = await axios.get("/api/user/data.json?id=0");
+        const { data } = await axios.get(`/api/user/data.json?id=${id}`);
         return {
             type: "FULL_USER_DATA",
             payload: data,
+            id: id,
         };
     } catch (err) {
         console.log("Received an error on /user:", err);
         return {
             type: "FULL_USER_DATA",
             payload: { error: "No Connection to Database" },
+            id: id,
         };
     }
 }
@@ -121,19 +123,54 @@ export async function updateBio(bio) {
             payload: { error: "Error in Connecting to Server" },
         };
     }
+}
 
-    // this.setState({
-    //     loading: false,
-    //     error: "Error in Connecting to Server",
-    // });
-    //     this.setState({
-    //         error: result.data.error,
-    //     });
-    //     this.props.setBio(this.state.bio);
-    //     this.toggleEditor();
+export async function submitFriendAction(id, task) {
+    // console.log("friend BTN Run (ID, TASK):", id, task);
+    try {
+        const result = await axios.post("/api/user/friendBtn.json", {
+            friendId: id,
+            task: task,
+        });
+        // console.log("result from BTN Action:", result.data);
+        return {
+            type: "SUBMIT_FRIEND_ACTION",
+            payload: {
+                text: result.data.text,
+                error: !!result.data.error,
+            },
+        };
+    } catch (err) {
+        return {
+            type: "SUBMIT_FRIEND_ACTION",
+            payload: {
+                text: false,
+                error: true,
+            },
+        };
+    }
+}
 
-    //     this.setState({
-    //         loading: true,
-    //     });
-    //     this.setState({ loading: false });
+// receiving a single message
+// receiving 10 messages caused my axios on starting <Chat />
+
+export async function receiveChatMessages() {
+    // FIXME error handling
+    // console.log("asking server for chat data:");
+    const { data } = await axios.get("api/chat.json");
+    // console.log("data:", data);
+    // const msgs = data.reverse();
+    // console.log("got data:", data);
+    return {
+        type: "RECEIVE_CHAT_MESSAGES",
+        payload: data.reverse(),
+    };
+}
+
+export function newChatMessage(obj) {
+    // console.log("Going to send chat data:", obj);
+    return {
+        type: "NEW_CHAT_MESSAGE",
+        payload: obj,
+    };
 }

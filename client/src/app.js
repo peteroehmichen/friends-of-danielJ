@@ -6,35 +6,27 @@ import Logo from "./logo";
 import ProfilePic from "./profilePic";
 import axios from "./axios";
 import Profile from "./profile";
-import OtherProfile from "./otherProfile";
+import OtherProfile, { OtherProfile2, OtherProfile3 } from "./otherProfile";
 import BioEditor from "./bioEditor";
 import FindFriends from "./findFriends";
 import { Spinner } from "./helpers";
 import Friends from "./friends";
+import Chat from "./chat";
 import Countdown from "./countdown";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserData, toggleUploadModal } from "./action";
 
 // FIXME on db-error in bio and sub-elements full reload /.
-// TODO create an effective loading spinner for full pages
 
 export function App2() {
     const dispatch = useDispatch();
     const { user, activateUploadModal } = useSelector((store) => store);
     useEffect(() => {
-        // console.log("starting APP");
         document.querySelector("main").style.backgroundImage = "none";
-        dispatch(getUserData());
-        // do the axios in here
+        dispatch(getUserData("0"));
     }, []);
 
     if (!user) return null;
-    // console.log("user:", user);
-
-    // const toggleUploadModal = function () {
-    //     // dispatch(toggleUploadModal());
-    //     console.log("switching Modal");
-    // };
 
     const setProfilePicUrl = function (url) {
         console.log("setting profile Pic");
@@ -89,6 +81,9 @@ export function App2() {
                     <Link to="/">
                         <div className="nav-element">own Profile</div>
                     </Link>
+                    <Link to="/chat">
+                        <div className="nav-element">Chat</div>
+                    </Link>
                     <Link to="/friends">
                         <div className="nav-element">Friend & Requests</div>
                     </Link>
@@ -106,6 +101,7 @@ export function App2() {
                         />
                     )}
                     <Route exact path="/" render={(props) => <Profile />} />
+                    <Route path="/chat" render={(props) => <Chat />} />
                     <Route
                         path="/friends"
                         render={(props) => <Friends history={props.history} />}
@@ -119,7 +115,7 @@ export function App2() {
                     <Route
                         path="/user/:id"
                         render={(props) => (
-                            <OtherProfile
+                            <OtherProfile3
                                 key={props.match.url}
                                 history={props.history}
                                 match={props.match}

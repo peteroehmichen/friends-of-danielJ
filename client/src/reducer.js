@@ -50,13 +50,27 @@ export default function reducer(store = {}, action) {
     }
 
     if (action.type == "FULL_USER_DATA") {
+        // console.log("calling Full User Data");
+        store = {
+            ...store,
+            user: {
+                ...store.user,
+            },
+            otherUser: {
+                ...store.otherUser,
+            },
+        };
         if (!action.payload.profilePicUrl) {
             action.payload.profilePicUrl = "/default_user.svg";
         }
-        store = {
-            ...store,
-            user: action.payload,
-        };
+        if (action.id == "0") {
+            store.user = action.payload;
+        } else {
+            store.otherUser = {
+                ...store.otherUser,
+                ...action.payload,
+            };
+        }
     }
 
     if (action.type == "TOGGLE_UPLOAD_MODAL") {
@@ -98,5 +112,52 @@ export default function reducer(store = {}, action) {
             store.user.bioError = null;
         }
     }
+
+    if (action.type == "SUBMIT_FRIEND_ACTION") {
+        // console.log("payload:", action.payload);
+        store = {
+            ...store,
+            user: {
+                ...store.user,
+            },
+            otherUser: {
+                ...store.otherUser,
+            },
+        };
+        store.otherUser.nextFriendAction = action.payload.text;
+        store.otherUser.dbError = action.payload.error;
+    }
+
+    if (action.type == "RECEIVE_CHAT_MESSAGES") {
+        // console.log("adding 10 chat Messages...");
+        store = {
+            ...store,
+            user: {
+                ...store.user,
+            },
+            otherUser: {
+                ...store.otherUser,
+            },
+            chat: action.payload || [],
+        };
+    }
+
+    if (action.type == "NEW_CHAT_MESSAGE") {
+        // console.log("adding new Message:", action.payload);
+        store = {
+            ...store,
+            user: {
+                ...store.user,
+            },
+            otherUser: {
+                ...store.otherUser,
+            },
+            chat: [...store.chat],
+        };
+        // console.log("Chat:", store.chat);
+        // console.log("Element:", action.payload);
+        store.chat.push(action.payload);
+    }
+
     return store;
 }

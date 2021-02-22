@@ -7,8 +7,6 @@ import ProfilePic from "./profilePic";
 export default function Profile(props) {
     const { user } = useSelector((store) => store);
 
-    const { setBio } = props;
-
     if (!user) return null;
 
     return (

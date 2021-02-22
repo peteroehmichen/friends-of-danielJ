@@ -152,3 +152,22 @@ module.exports.getAllRelations = function (userId) {
         [userId]
     );
 };
+
+module.exports.getLastChats = function () {
+    return sql.query(
+        `SELECT chat.id, text, chat.created_at, first, last, profile_pic_url FROM chat JOIN users ON sender = users.id ORDER BY chat.id DESC LIMIT 10;`
+    );
+};
+
+module.exports.addNewMessage = async function (id, msg) {
+    return {
+        chat: await sql.query(
+            `INSERT INTO chat (sender, text) VALUES ($1, $2) RETURNING created_at, text;`,
+            [id, msg]
+        ),
+        user: await sql.query(
+            `SELECT first, last, profile_pic_url from users WHERE id=$1`,
+            [id]
+        ),
+    };
+};
