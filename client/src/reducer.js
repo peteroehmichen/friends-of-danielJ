@@ -73,6 +73,24 @@ export default function reducer(store = {}, action) {
         }
     }
 
+    if (action.type == "UPDATE_PROFILE_PICTURE") {
+        //
+        store = {
+            ...store,
+            user: {
+                ...store.user,
+            },
+            otherUser: {
+                ...store.otherUser,
+            },
+        };
+        if (action.payload) {
+            store.user.profilePicUrl = action.payload;
+        } else {
+            store.user.profilePicError = action.error;
+        }
+    }
+
     if (action.type == "TOGGLE_UPLOAD_MODAL") {
         store = {
             ...store,

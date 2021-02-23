@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { receiveChatMessages, sendChatMessage } from "./action";
+import { receiveChatMessages } from "./action";
+import { format_time } from "./helpers";
 import { emitSingleMessage } from "./socket";
 
 export default function Chat() {
@@ -8,79 +9,69 @@ export default function Chat() {
     const input = useRef(null);
     const [value, setValue] = useState("");
     const dispatch = useDispatch();
-    let messages = useSelector((store) => store.chat);
+    const messages = useSelector((store) => store.chat);
+
     useEffect(() => {
-        console.log("chatRef:", chatRef);
-        // console.log("loading of Chat");
+        if (messages) {
+            chatRef.current.scrollTop =
+                chatRef.current.scrollHeight - chatRef.current.clientHeight;
+        }
         dispatch(receiveChatMessages());
-    }, [chatRef]);
+    }, [messages]);
 
-    if (!messages) return null;
-
-    const submit = function () {
+    const submit = function (e) {
         setValue(null);
-        input.current.value = null;
-        input.current.focus();
-        emitSingleMessage(value);
+        // console.log(e);
+        if (e.key === "Enter" || e.type == "click") {
+            emitSingleMessage(value);
+            input.current.value = "";
+            input.current.focus();
+        }
     };
 
-    // console.log("Messages:", messages[0]);
-
-    // console.log(chat.current.scrollTop);
-    // console.log(chat.current.scrollHeight);
-    // console.log(chat.current.clientHeight);
     return (
         <div className="chat">
             <div className="chat-container">
-                <div
-                    ref={chatRef}
-                    className="messages"
-                    onLoad={() => {
-                        chatRef.current.scrollTop =
-                            chatRef.current.scrollHeight -
-                            chatRef.current.clientHeight;
-                    }}
-                >
-                    {messages.map((msg, i) => (
-                        <div className="message" key={i}>
-                            <div className="chat-image">
-                                <img src={msg.profile_pic_url} />
-                            </div>
-                            <div className="chat-right">
-                                <div className="chat-head">
-                                    <h5>
-                                        {msg.first} {msg.last}
-                                    </h5>
-                                    <p>
-                                        {new Date(
-                                            msg.created_at
-                                        ).toLocaleDateString()}
-                                    </p>
-                                </div>
-                                <div className="chat-body">
-                                    <p>{msg.text}</p>
-                                </div>
-                            </div>
+                <div ref={chatRef} className="messages">
+                    {((!messages || messages.length == 0) && (
+                        <div className="messages">
+                            <h5>So far no Messages</h5>
                         </div>
-                    ))}
+                    )) ||
+                        (messages &&
+                            messages.map((msg, i) => (
+                                <div className="message" key={i}>
+                                    <div className="chat-image">
+                                        <img src={msg.profile_pic_url} />
+                                    </div>
+                                    <div className="chat-right">
+                                        <div className="chat-head">
+                                            <h4>
+                                                {msg.first} {msg.last}
+                                            </h4>
+                                            <p>{format_time(msg.created_at)}</p>
+                                        </div>
+                                        <div className="chat-body">
+                                            <p>{msg.text}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )))}
                 </div>
                 <div className="new-message">
                     <textarea
+                        placeholder="type your message"
+                        onChange={(e) => setValue(e.target.value)}
+                        onKeyPress={(e) => submit(e)}
                         ref={input}
-                        defaultValue={value}
                         className="chat-input"
-                        onKeyDown={(e) => {
-                            if (e.keyCode == 13) {
-                                if (value) {
-                                    submit();
-                                }
-                            }
-                        }}
-                        onChange={(e) => {
-                            setValue(e.target.value);
-                        }}
                     />
-                    <button disabled={!value} onClick={submit}>
+                    <button
+                        disabled={!value}
+                        onClick={(e) => {
+                            submit(e);
+                        }}
+                    >
                         Publish Message
                     </button>
                 </div>

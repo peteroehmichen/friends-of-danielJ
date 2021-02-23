@@ -84,6 +84,19 @@ export async function getUserData(id) {
     }
 }
 
+export async function updateProfilePicture(response) {
+    const obj = {
+        type: "UPDATE_PROFILE_PICTURE",
+    };
+    if (response.url) {
+        obj.payload = response.url;
+    } else {
+        obj.profilePicError = response.error;
+    }
+
+    return obj;
+}
+
 export async function toggleUploadModal() {
     // console.log("Going to fetch user data:");
     return {

@@ -92,14 +92,7 @@ export function App2() {
                     </Link>
                 </div>
                 <div className="app-main">
-                    {activateUploadModal && (
-                        <Uploader
-                            toggleUploadModal={toggleUploadModal}
-                            setProfilePicUrl={setProfilePicUrl}
-                            numberOfFriends={user.total}
-                            userSince={user.userSince}
-                        />
-                    )}
+                    {activateUploadModal && <Uploader />}
                     <Route exact path="/" render={(props) => <Profile />} />
                     <Route path="/chat" render={(props) => <Chat />} />
                     <Route

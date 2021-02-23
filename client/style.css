@@ -388,7 +388,7 @@ input[type="email"] {
     height: 100%;
     margin-right: 50px;
     overflow-y: auto;
-    overflow-x: ;
+    overflow-x: hidden;
 }
 
 .found-friend {
@@ -551,13 +551,14 @@ button {
 
 .messages {
     width: 100%;
-    height: 400px;
+    max-height: 400px;
     overflow-y: auto;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
+    border: 2px solid blue;
 }
 
 .message {

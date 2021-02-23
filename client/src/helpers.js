@@ -11,6 +11,30 @@ export function Spinner() {
     );
 }
 
+export function format_time(created) {
+    let timePassed = Date.now() - new Date(created);
+    let minutes = timePassed / (1000 * 60);
+    let hours = minutes / 60;
+    if (hours >= 48) {
+        timePassed = Math.floor(hours / 24);
+        timePassed = timePassed + " days ago";
+    } else if (hours > 24) {
+        timePassed = Math.floor(hours - 24);
+        timePassed = `1 day ago`;
+    } else if (hours >= 1) {
+        // more than 1 hour
+        timePassed = Math.floor(hours);
+        timePassed = timePassed + " hour/s ago";
+    } else {
+        if (minutes > 1) {
+            timePassed = Math.floor(minutes) + " minute/s ago";
+        } else {
+            timePassed = "less than 1 minute ago";
+        }
+    }
+    return timePassed;
+}
+
 export function useAthenticate(url, values) {
     const [status, setStatus] = useState({
         error: false,
