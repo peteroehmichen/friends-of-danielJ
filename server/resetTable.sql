@@ -1,4 +1,4 @@
-DROP TABLES IF EXISTS chat;
+DROP TABLE IF EXISTS chat;
 DROP TABLE IF EXISTS codes;
 DROP TABLE IF EXISTS friendships;
 DROP TABLE IF EXISTS users;
@@ -31,8 +31,9 @@ CREATE TABLE friendships (
 
 CREATE TABLE chat (
       id SERIAL PRIMARY KEY,
+      response_to INT,
       sender INT REFERENCES users(id) NOT NULL,
-      recipient INT REFERENCES users(id),
+      recipient INT NOT NULL,
       text TEXT NOT  NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

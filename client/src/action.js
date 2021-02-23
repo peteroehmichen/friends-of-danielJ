@@ -1,4 +1,5 @@
 import axios from "./axios";
+import { analyseMessages } from "./helpers";
 
 export async function getList() {
     const { data } = await axios.get("/api/friends.json");
@@ -167,23 +168,39 @@ export async function submitFriendAction(id, task) {
 // receiving a single message
 // receiving 10 messages caused my axios on starting <Chat />
 
-export async function receiveChatMessages() {
-    // FIXME error handling
+export async function receiveChatMessages(user) {
     // console.log("asking server for chat data:");
-    const { data } = await axios.get("api/chat.json");
-    // console.log("data:", data);
+    const { data } = await axios.get(`api/chat.json?q=${user}`);
+    // console.log("data from AXIOS CHAT:", data);
     // const msgs = data.reverse();
     // console.log("got data:", data);
-    return {
-        type: "RECEIVE_CHAT_MESSAGES",
-        payload: data.reverse(),
-    };
+    if (!data.error) {
+        const sorted = analyseMessages(data.reverse());
+        return {
+            type: "RECEIVE_CHAT_MESSAGES",
+            payload: sorted,
+        };
+    } else {
+        return {
+            type: "RECEIVE_CHAT_MESSAGES",
+            payload: data.error,
+        };
+    }
 }
 
 export function newChatMessage(obj) {
-    // console.log("Going to send chat data:", obj);
+    console.log("Got a new chat msg:", obj);
     return {
         type: "NEW_CHAT_MESSAGE",
         payload: obj,
+    };
+}
+
+export function activeUsers(arr) {
+    //
+    // console.log("payload: ", arr);
+    return {
+        type: "ACTIVE_USERS",
+        payload: arr,
     };
 }

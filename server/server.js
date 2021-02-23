@@ -26,7 +26,11 @@ const {
 
 const db = require("./db");
 const auth = require("./auth");
-const { sendEMail, uploader, uploadToAWS } = require("./aws");
+const { sendEMail, uploader, uploadToAWS, deleteFromAWS } = require("./aws");
+const { distributeNewChatMessage, activeUsers } = require("./socketHelpers");
+
+const activeSockets = {};
+let id;
 
 app.use(cookieSessionMiddleware);
 io.use(function (socket, next) {
@@ -296,14 +300,17 @@ app.post(
     "/api/user/profile-pic.json",
     uploader.single("file"),
     async (req, res) => {
+        // console.log("req.body:", req.body.old);
+        // console.log("req.old:", req.old);
         try {
-            const aws = await uploadToAWS(req);
+            const awsAdd = await uploadToAWS(req);
+            const awsDelete = await deleteFromAWS(req.body.old);
             let sql;
-            if (aws.url) {
-                sql = await db.addProfilePic(aws.url, req.session.userId);
+            if (awsAdd.url && awsDelete.success) {
+                sql = await db.addProfilePic(awsAdd.url, req.session.userId);
             }
             if (sql.rowCount > 0) {
-                res.json(aws);
+                res.json(awsAdd);
             } else {
                 res.json({ error: "DB rejected new picture" });
             }
@@ -327,12 +334,34 @@ app.post("/api/profile-bio.json", async (req, res) => {
 });
 
 app.get("/api/chat.json", async (req, res) => {
+    // console.log("requested chat", req.query);
+    // TODO filter messages for access
+    id = req.session.userId;
     try {
-        const { rows } = await db.getLastChats();
+        const { rows } = await db.getLastChats(req.session.userId, req.query.q);
+        // console.log("sending Chats with id", req.query.q);
         res.json(rows);
     } catch (error) {
         console.log("error in loading chat:", error);
         res.json({ error: "Error in Loading Chat" });
+    }
+});
+
+app.post("/api/deleteUser", async (req, res) => {
+    // console.log("deleting the user with URL:", req.body.url);
+    try {
+        const awsDeletion = await deleteFromAWS(req.body.url);
+        const sqlDeletion = await db.deleteAllUserData(req.session.userId);
+        res.json({
+            success: true,
+            deletionResult: {
+                awsDeletion,
+                sqlDeletion,
+            },
+        });
+    } catch (error) {
+        console.log("error while deletion:", error);
+        res.json({ success: false });
     }
 });
 
@@ -353,29 +382,59 @@ server.listen(process.env.PORT || 3001, function () {
     console.log("I'm listening.");
 });
 
-io.on("connection", (socket) => {
-    console.log("Socket got connected:", socket.id);
-    console.log("Socket connected to UserId:", socket.request.session.userId);
-
-    // socket.emit("Hello", { test: "this is the first transmission" });
-    // socket.on("Likewise", (obj) => {
-    //     console.log("receievd:", obj);
-    // });
+io.on("connection", async (socket) => {
+    // console.log(socket.request);
+    activeSockets[socket.id] = socket.request.session.userId;
+    // console.log("Change in Socket-Conenctions");
+    // console.log(activeSockets);
+    // const users = activeUsers(activeSockets);
+    // console.log("xxx:", users);
+    io.emit("activeUsers", await activeUsers(activeSockets));
+    // activeUsers(activeSockets);
 
     socket.on("newMessage", async (msg) => {
-        // FIXME error handling
-        // console.log("received:", msg);
-        const result = await db.addNewMessage(
-            socket.request.session.userId,
-            msg
-        );
-        // console.log(result.chat.rows[0]);
-        // console.log(result.user.rows[0]);
-        io.emit("newMsg", {
-            ...result.user.rows[0],
-            ...result.chat.rows[0],
-        });
+        console.log("message:", msg);
+        let status;
+        try {
+            const result = await db.addNewMessage(
+                socket.request.session.userId,
+                msg.replyTo,
+                msg.recipient,
+                msg.value
+            );
+            status = {
+                ...result.user.rows[0],
+                ...result.chat.rows[0],
+            };
+        } catch (error) {
+            status = { error: "Server Error" };
+        }
+        if (msg.recipient == 0) {
+            // message to all
+            status.public = true;
+            status.private = false;
+            io.emit("newMsg", status);
+        } else if (msg.recipient == id) {
+            // message to self
+            status.public = false;
+            status.private = true;
+            socket.emit("newMsg", status);
+        } else {
+            // private PM
+            status.public = false;
+            status.private = true;
+            socket.emit("newMsg", status);
+            let recipientSocket = Object.entries(activeSockets);
+            for (let i = 0; i < recipientSocket.length; i++) {
+                if (recipientSocket[i][1] == msg.recipient) {
+                    io.to(recipientSocket[i][0]).emit("newMsg", status);
+                }
+            }
+        }
     });
 
-    // emitting a single message to all active users
+    socket.on("disconnect", async () => {
+        delete activeSockets[socket.id];
+        io.emit("activeUsers", await activeUsers(activeSockets));
+    });
 });

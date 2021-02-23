@@ -62,6 +62,27 @@ module.exports.uploadToAWS = async function (req) {
     return { url: S3URL + req.file.filename };
 };
 
+module.exports.deleteFromAWS = async (url) => {
+    if (url.startsWith(S3URL)) {
+        const filename = url.replace(S3URL, "");
+        const params = {
+            Bucket: "oehmichen-messageboard",
+            Key: filename,
+        };
+        try {
+            await s3.deleteObject(params).promise();
+            // console.log("S3 Picture deleted");
+            return { success: true };
+        } catch (error) {
+            console.log("S3 deletion error", error);
+            return { success: false };
+        }
+    } else {
+        // console.log("no linked passed for deletion");
+        return { success: true };
+    }
+};
+
 // module.exports.uploadToAWS = (req, res, next) => {
 //     if (!req.file) {
 //         res.json({ error: "File does not match standards" });

@@ -11,6 +11,41 @@ export function Spinner() {
     );
 }
 
+export function analyseMessages(arr) {
+    var startArray = arr.slice();
+    var endArray = [];
+    var i, j;
+    var temp;
+    var indent = 0;
+    for (i = 0; i < startArray.length; i++) {
+        if (startArray[i].response_to == 0) {
+            startArray[i].indent = indent;
+            endArray.push(startArray[i]);
+            startArray.splice(i, 1);
+            i--;
+        }
+    }
+    while (startArray.length > 0) {
+        indent++;
+
+        for (i = 0; i < endArray.length; i++) {
+            for (j = 0; j < startArray.length; j++) {
+                if (
+                    endArray[i].indent == indent - 1 &&
+                    endArray[i].id == startArray[j].response_to
+                ) {
+                    startArray[j].indent = indent;
+                    temp = startArray[j];
+                    startArray.splice(j, 1);
+                    j--;
+                    endArray.splice(i + 1, 0, temp);
+                }
+            }
+        }
+    }
+    return endArray;
+}
+
 export function format_time(created) {
     let timePassed = Date.now() - new Date(created);
     let minutes = timePassed / (1000 * 60);

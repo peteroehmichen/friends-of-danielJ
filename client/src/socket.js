@@ -1,4 +1,4 @@
-import { receiveChatMessages, newChatMessage } from "./action";
+import { receiveChatMessages, newChatMessage, activeUsers } from "./action";
 import { io } from "socket.io-client";
 // import { useDispatch } from "react-redux";
 
@@ -19,6 +19,11 @@ export const init = (store) => {
         // listening to all server events and dispatching the correct action
         // receiving single message
         // receiving last 10 messages
+
+        socket.on("activeUsers", (arr) => {
+            // console.log("Users:", arr);
+            return store.dispatch(activeUsers(arr));
+        });
     }
 };
 

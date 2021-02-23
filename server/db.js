@@ -153,21 +153,63 @@ module.exports.getAllRelations = function (userId) {
     );
 };
 
-module.exports.getLastChats = function () {
-    return sql.query(
-        `SELECT chat.id, text, chat.created_at, first, last, profile_pic_url FROM chat JOIN users ON sender = users.id ORDER BY chat.id DESC LIMIT 10;`
-    );
+module.exports.getLastChats = function (userId, recipientId) {
+    let q;
+    if (recipientId == 0) {
+        q = `SELECT chat.id, response_to, text, chat.created_at, first, last, profile_pic_url FROM chat JOIN users ON sender = users.id WHERE recipient=0 ORDER BY chat.id DESC LIMIT 10;`;
+    } else {
+        q = `SELECT chat.id, response_to, text, chat.created_at, first, last, profile_pic_url FROM chat JOIN users ON sender = users.id WHERE (recipient=${userId} AND sender=${recipientId}) OR (sender=${userId} AND recipient=${recipientId}) ORDER BY chat.id DESC LIMIT 10;`;
+    }
+
+    return sql.query(q);
 };
 
-module.exports.addNewMessage = async function (id, msg) {
+module.exports.addNewMessage = async function (
+    sender,
+    replyTo,
+    recipient,
+    msg
+) {
+    // console.log("new CHAT from", sender);
+    // console.log("new CHAT for", recipient);
+    // console.log("with", msg);
     return {
         chat: await sql.query(
-            `INSERT INTO chat (sender, text) VALUES ($1, $2) RETURNING created_at, text;`,
-            [id, msg]
+            `INSERT INTO chat (response_to, sender, recipient, text) VALUES ($1, $2, $3, $4) RETURNING id, response_to, created_at, recipient, text;`,
+            [replyTo, sender, recipient, msg]
         ),
         user: await sql.query(
             `SELECT first, last, profile_pic_url from users WHERE id=$1`,
-            [id]
+            [sender]
         ),
     };
+};
+
+module.exports.deleteAllUserData = async function (id) {
+    const chat = await sql.query(
+        `DELETE FROM chat WHERE sender=$1 OR recipient=$1`,
+        [id]
+    );
+    const friendships = await sql.query(
+        `DELETE FROM friendships WHERE sender=$1 OR recipient=$1`,
+        [id]
+    );
+    const mail = await sql.query(`SELECT email FROM users WHERE id=$1`, [id]);
+    const codes = await sql.query(`DELETE FROM codes WHERE email=$1`, [
+        mail.rows[0].email,
+    ]);
+    const users = await sql.query(`DELETE FROM users WHERE id=$1`, [id]);
+    return {
+        chat: chat,
+        friendships: friendships,
+        mail: mail.rows[0].email,
+        users: users,
+    };
+};
+
+module.exports.getActiveUsersByIds = function (arrayOfIds) {
+    return sql.query(
+        `SELECT id, first, last, profile_pic_url FROM users WHERE id = ANY($1);`,
+        [arrayOfIds]
+    );
 };

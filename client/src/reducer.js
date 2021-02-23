@@ -172,9 +172,26 @@ export default function reducer(store = {}, action) {
             },
             chat: [...store.chat],
         };
-        // console.log("Chat:", store.chat);
-        // console.log("Element:", action.payload);
-        store.chat.push(action.payload);
+        if (action.payload.error) {
+            store.chatError = action.payload.error;
+        } else {
+            store.chat.push(action.payload);
+            store.chatError = null;
+        }
+    }
+
+    if (action.type == "ACTIVE_USERS") {
+        store = {
+            ...store,
+            user: {
+                ...store.user,
+            },
+            otherUser: {
+                ...store.otherUser,
+            },
+            chat: store.chat ? [...store.chat] : [],
+        };
+        store.activeUsers = action.payload;
     }
 
     return store;

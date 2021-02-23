@@ -46,6 +46,8 @@ export default function Uploader() {
 
         const profilePicture = new FormData();
         profilePicture.append("file", file);
+        profilePicture.append("old", user.profilePicUrl);
+
         const response = {};
         try {
             const { data } = await axios.post(
@@ -92,18 +94,25 @@ export default function Uploader() {
         container.current.removeEventListener("mousemove", shiftPane);
     }
 
-    function deleteAccount(e) {
+    async function deleteAccount(e) {
         e.preventDefault();
         console.log("clicked with", e.target.innerText);
         if (e.target.innerText == "Are you SURE?") {
-            console.log("going to delete USER");
+            setLoading(true);
+            setConfirm("deleting...");
+            // console.log("going to delete USER");
             // FIXME user deletion
+            const result = await axios.post("/api/deleteUser", {
+                url: user.profilePicUrl,
+            });
+            // console.log("Deletion status:", result);
+            setLoading(false);
             location.replace("/logout");
         } else {
             setLoading(true);
             setConfirm("please wait...");
+            setLoading(false);
             setTimeout(() => {
-                setLoading(false);
                 setConfirm("Are you SURE?");
             }, 3000);
         }

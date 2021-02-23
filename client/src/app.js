@@ -28,10 +28,6 @@ export function App2() {
 
     if (!user) return null;
 
-    const setProfilePicUrl = function (url) {
-        console.log("setting profile Pic");
-    };
-
     return (
         <BrowserRouter>
             <div className="app-frame debug-black">
