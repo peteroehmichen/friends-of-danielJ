@@ -12,6 +12,7 @@ export function Spinner() {
 }
 
 export function analyseMessages(arr) {
+    var maxInterations = arr.length;
     var startArray = arr.slice();
     var endArray = [];
     var i, j;
@@ -27,7 +28,9 @@ export function analyseMessages(arr) {
     }
     while (startArray.length > 0) {
         indent++;
-
+        if (indent > maxInterations) {
+            break;
+        }
         for (i = 0; i < endArray.length; i++) {
             for (j = 0; j < startArray.length; j++) {
                 if (
@@ -43,6 +46,7 @@ export function analyseMessages(arr) {
             }
         }
     }
+    // console.log("end Array:");
     return endArray;
 }
 

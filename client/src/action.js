@@ -13,9 +13,10 @@ export async function getList() {
 export async function unfriend(id) {
     // console.log("Going to unfriend id", id);
     const { data } = await axios.post("/api/user/friendBtn.json", {
-        action: "Cancel Friendship",
+        task: "Cancel Friendship",
         friendId: id,
     });
+    console.log("received:", data);
     if (!data.error) {
         return {
             type: "CANCEL_FRIENDSHIP",
@@ -27,7 +28,7 @@ export async function unfriend(id) {
 export async function acceptRequest(id) {
     // console.log("Going to accept id", id);
     const { data } = await axios.post("/api/user/friendBtn.json", {
-        action: "Accept Request",
+        task: "Accept Request",
         friendId: id,
     });
     if (!data.error) {
@@ -42,7 +43,7 @@ export async function denyRequest(id) {
     // console.log("Going to deny id", id);
     const { data } = await axios.post("/api/user/friendBtn.json", {
         action: "Deny Request",
-        friendId: id,
+        task: id,
     });
     if (!data.error) {
         return {
@@ -55,7 +56,7 @@ export async function denyRequest(id) {
 export async function cancelRequest(id) {
     // console.log("Going to cancel id", id);
     const { data } = await axios.post("/api/user/friendBtn.json", {
-        action: "Cancel Request",
+        task: "Cancel Request",
         friendId: id,
     });
     if (!data.error) {
@@ -173,11 +174,14 @@ export async function receiveChatMessages(user) {
     const { data } = await axios.get(`api/chat.json?q=${user}`);
     // console.log("data from AXIOS CHAT:", data);
     // const msgs = data.reverse();
-    console.log("FIXME - sorted chat messages:", data);
+    // console.log("FIXME - sorted chat messages:", data);
     if (!data.error) {
         // FIXME analyse messages
-        // const sorted = analyseMessages(data.reverse());
-        const sorted = data.reverse();
+        const sorted = analyseMessages(data.reverse());
+        // console.log("arr:", data);
+        // console.log(Array.isArray(data));
+        // sorted = data.reverse();
+        // console.log("arr:", sorted);
         return {
             type: "RECEIVE_CHAT_MESSAGES",
             payload: sorted,

@@ -21,26 +21,27 @@ export function OtherProfile3(props) {
     // const [friendBtnText, setFriendBtnText] = useState("");
 
     const otherUser = (
-        <div className="other-profile debug-green">
-            <h2>
-                {first} {last}
-            </h2>
-            <h4>{bio}</h4>
-            <div className="profile-pic-main">
-                <img
-                    src={profilePicUrl}
-                    alt={first}
-                    onError={(e) => {
-                        e.target.setAttribute("src", "");
-                    }}
-                />
+        <div className="main-view own-profile">
+            <img
+                className="profile-picture large"
+                src={profilePicUrl}
+                alt={first}
+                onError={(e) => {
+                    e.target.setAttribute("src", "");
+                }}
+            />
+
+            <div className="profile-information">
+                <h1>
+                    {first} {last}
+                </h1>
+                <p>{bio}</p>
+                <FriendButton friendId={props.match.params.id} />
             </div>
-            <FriendButton friendId={props.match.params.id} />
         </div>
     );
     const errorBlock = (
-        <div className="other-profile debug-green">
-            <h2>{error}</h2>
+        <div className="main-view own-profile">
             <h4>
                 Automatically redirecting you to Start-Page in{" "}
                 <Countdown
@@ -54,6 +55,8 @@ export function OtherProfile3(props) {
 
     return (error && errorBlock) || otherUser;
 }
+
+// old stuff after here
 
 export function OtherProfile2(props) {
     const [first, setFirst] = useState("");

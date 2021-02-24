@@ -19,9 +19,9 @@ export default function Profile() {
         <div className="main-view own-profile">
             <ProfilePic size="large" />
             <div className="profile-information">
-                <h2>
-                    Hello, {user.first} {user.last}
-                </h2>
+                <h1>
+                    {user.first} {user.last}
+                </h1>
                 <BioEditor2 />
             </div>
         </div>

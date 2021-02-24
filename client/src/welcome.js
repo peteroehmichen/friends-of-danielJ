@@ -11,23 +11,28 @@ import Logo from "./logo";
 export default function Welcome(props) {
     return (
         <Fragment>
-            <Logo />
             <div className="welcome">
                 <div className="welcome-intro">
+                    <h1>Friends of Daniel Johnston</h1>
                     <p>
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Enim, consequuntur cum! Qui libero odio, ducimus
-                        molestiae aperiam nemo eos quis sed eveniet dolor, quam
-                        ipsam excepturi deserunt suscipit provident ea.
+                        This site is dedicated to Daniel Johnston - a true
+                        artist in music and art. Join this community of
+                        likeminded people, interact and make new friends.
                     </p>
+                    <p>We are more than we think.</p>
                 </div>
-                <HashRouter>
-                    <Fragment>
-                        <Route exact path="/" component={Registration} />
-                        <Route path="/login" component={Login} />
-                        <Route path="/reset" component={PasswordReset} />
-                    </Fragment>
-                </HashRouter>
+                <div className="welcome-frame">
+                    <div className="logo-frame">
+                        <Logo design="logo-front" />
+                    </div>
+                    <HashRouter>
+                        <Fragment>
+                            <Route exact path="/" component={Registration} />
+                            <Route path="/login" component={Login} />
+                            <Route path="/reset" component={PasswordReset} />
+                        </Fragment>
+                    </HashRouter>
+                </div>
             </div>
         </Fragment>
     );

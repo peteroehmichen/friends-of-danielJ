@@ -156,10 +156,16 @@ module.exports.getAllRelations = function (userId) {
 module.exports.getLastChats = function (userId, recipientId) {
     let q;
     if (recipientId == 0) {
-        q = `SELECT chat.id, response_to, text, chat.created_at, first, last, profile_pic_url FROM chat JOIN users ON sender = users.id WHERE recipient=0 ORDER BY chat.id DESC LIMIT 10;`;
+        q = `WITH lowestID AS (SELECT MIN(id) FROM chat WHERE recipient=0 AND response_to=0 LIMIT 10) SELECT chat.id, response_to, text, chat.created_at, first, last, profile_pic_url FROM chat JOIN users ON sender=users.id JOIN lowestID ON chat.id>=lowestId.min WHERE recipient=0 ORDER BY chat.id DESC;`;
     } else {
-        q = `SELECT chat.id, response_to, text, chat.created_at, first, last, profile_pic_url FROM chat JOIN users ON sender = users.id WHERE (recipient=${userId} AND sender=${recipientId}) OR (sender=${userId} AND recipient=${recipientId}) ORDER BY chat.id DESC LIMIT 10;`;
+        q = `WITH lowestID AS (SELECT MIN(id) FROM chat WHERE (recipient=${userId} AND sender=${recipientId} AND response_to=0) OR (sender=${userId} AND recipient=${recipientId} AND response_to=0) LIMIT 10) SELECT chat.id, response_to, text, chat.created_at, first, last, profile_pic_url FROM chat JOIN users ON sender=users.id JOIN lowestID ON chat.id>=lowestId.min WHERE (recipient=${recipientId} AND sender=${userId}) OR (sender=${recipientId} AND recipient=${userId})ORDER BY chat.id DESC;`;
     }
+
+    // if (recipientId == 0) {
+    //     q = `SELECT chat.id, response_to, text, chat.created_at, first, last, profile_pic_url FROM chat JOIN users ON sender = users.id WHERE recipient=0 ORDER BY chat.id DESC LIMIT 10;`;
+    // } else {
+    //     q = `SELECT chat.id, response_to, text, chat.created_at, first, last, profile_pic_url FROM chat JOIN users ON sender = users.id WHERE (recipient=${userId} AND sender=${recipientId}) OR (sender=${userId} AND recipient=${recipientId}) ORDER BY chat.id DESC LIMIT 10;`;
+    // }
 
     return sql.query(q);
 };

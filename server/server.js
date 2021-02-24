@@ -192,6 +192,7 @@ app.get("/api/friends.json", async (req, res) => {
 });
 
 app.post("/api/user/friendBtn.json", async (req, res) => {
+    // console.log();
     try {
         if (req.body.task == "") {
             const { rows } = await db.getFriendInfo(

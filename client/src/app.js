@@ -15,8 +15,7 @@ import Chat from "./chat";
 import Countdown from "./countdown";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserData, toggleUploadModal } from "./action";
-
-// FIXME on db-error in bio and sub-elements full reload /.
+import Fader from "./fader";
 
 export function App2() {
     const dispatch = useDispatch();
@@ -53,7 +52,7 @@ export function App2() {
                 )}
 
                 <div className="header">
-                    <Logo />
+                    <Logo design="logo-nav" withTitle="true" />
                     <div className="header-right">
                         <ProfilePic size="small" />
                         <div className="header-nav">
@@ -75,45 +74,52 @@ export function App2() {
                 </div>
                 <div className="nav-bar">
                     <Link to="/">
-                        <div className="nav-element">own Profile</div>
+                        <div className="nav-element">My Profile</div>
                     </Link>
                     <Link to="/chat">
                         <div className="nav-element">Chat</div>
                     </Link>
                     <Link to="/friends">
-                        <div className="nav-element">Friend & Requests</div>
+                        <div className="nav-element">Friends</div>
                     </Link>
                     <Link to="/users">
-                        <div className="nav-element">find Friends</div>
+                        <div className="nav-element">find People</div>
                     </Link>
                 </div>
                 <div className="app-main">
-                    {activateUploadModal && <Uploader />}
-                    <Route exact path="/" render={() => <Profile />} />
-                    <Route
-                        path="/chat"
-                        render={(props) => <Chat history={props.history} />}
-                    />
-                    <Route
-                        path="/friends"
-                        render={(props) => <Friends history={props.history} />}
-                    />
-                    <Route
-                        path="/users"
-                        render={(props) => (
-                            <FindFriends history={props.history} />
-                        )}
-                    />
-                    <Route
-                        path="/user/:id"
-                        render={(props) => (
-                            <OtherProfile3
-                                key={props.match.url}
-                                history={props.history}
-                                match={props.match}
-                            />
-                        )}
-                    />
+                    <div className="app-main-left">
+                        <Fader />
+                    </div>
+                    <div className="app-main-right">
+                        {activateUploadModal && <Uploader />}
+                        <Route exact path="/" render={() => <Profile />} />
+                        <Route
+                            path="/chat"
+                            render={(props) => <Chat history={props.history} />}
+                        />
+                        <Route
+                            path="/friends"
+                            render={(props) => (
+                                <Friends history={props.history} />
+                            )}
+                        />
+                        <Route
+                            path="/users"
+                            render={(props) => (
+                                <FindFriends history={props.history} />
+                            )}
+                        />
+                        <Route
+                            path="/user/:id"
+                            render={(props) => (
+                                <OtherProfile3
+                                    key={props.match.url}
+                                    history={props.history}
+                                    match={props.match}
+                                />
+                            )}
+                        />
+                    </div>
                 </div>
             </div>
         </BrowserRouter>

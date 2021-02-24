@@ -23,7 +23,7 @@ main {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-image: url("wp3.jpg");
+    background-image: url("bg_intro.jpg");
     background-repeat: no-repeat;
     background-size: cover;
 }
@@ -32,8 +32,8 @@ footer {
     height: 40px;
     width: 100%;
     padding: 5px 0;
-    background-color: rgba(0, 0, 0, 0.87);
-    color: rgba(255, 255, 255, 0.721);
+    background-color: #004a7c;
+    color: rgba(255, 255, 255, 0.87);
     text-align: center;
 }
 
@@ -53,6 +53,20 @@ textarea {
     font-family: Arial, Helvetica, sans-serif;
     width: 300px;
     height: 160px;
+}
+
+button {
+    margin: 10px 0;
+    position: relative;
+    /* background-color: tomato; */
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 1em;
+    width: 90%;
+    min-width: 150px;
+    height: 30px;
+    overflow: hidden;
 }
 
 .logo-nav {
@@ -78,7 +92,7 @@ textarea {
     border-radius: 15px;
     width: 60%;
     min-width: 550px;
-    height: 60%;
+    height: 65%;
     min-height: 400px;
     background-color: rgba(255, 255, 255, 0.75);
     display: flex;
@@ -87,12 +101,28 @@ textarea {
     justify-content: space-between;
 }
 
+.welcome-frame {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+}
+
+.logo-frame {
+    width: 50%;
+    height: 80%;
+    align-self: center;
+}
+
 .welcome-blocks {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    align-items: center;
+    align-items: flex-start;
     height: 100%;
+    width: 100%;
+    padding: 15px;
+    /* background-color: rgba(255, 255, 255, 0.425); */
 }
 
 .welcome-blocks .title {
@@ -102,7 +132,7 @@ textarea {
 .form {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
 }
 
 .form p {
@@ -155,6 +185,7 @@ input[type="email"] {
     align-items: center;
     padding: 10px 20px 0;
     overflow: hidden;
+    background-color: #e8f1f5;
 }
 
 .header-right {
@@ -199,8 +230,9 @@ input[type="email"] {
     flex-direction: row;
     justify-content: space-evenly;
     align-items: center;
-    border-bottom: 7px solid green;
+    border-bottom: 7px solid #005691;
     padding-top: 20px;
+    background-color: #e8f1f5;
 }
 
 .nav-element {
@@ -210,13 +242,46 @@ input[type="email"] {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: green;
+    background-color: #005691;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
+    color: rgba(255, 255, 255, 0.87);
     /* border-radius: 10px; */
 }
 
 .app-main {
+    position: relative;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    height: 100%;
+    width: 100%;
+}
+
+.app-main-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    height: 100%;
+    border: 1px solid black;
+    background-color: #fafafa;
+}
+
+.fader {
+    position: relative;
+    width: 100%;
+}
+
+.fader img {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.app-main-right {
     position: relative;
     width: 100%;
     height: 100%;
@@ -224,6 +289,7 @@ input[type="email"] {
     flex-direction: row;
     justify-content: flex-start;
     overflow: hidden;
+    background-color: #fafafa;
 }
 
 .overlay {
@@ -322,11 +388,12 @@ input[type="email"] {
     width: 100%;
     height: 100%;
     padding: 15px;
-    overflow: hidden;
+    overflow: auto;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
 }
 
 .profile-information {
@@ -353,23 +420,71 @@ input[type="email"] {
     height: 100%;
     display: flex;
     flex-direction: column;
+    flex-wrap: nowrap;
+    /* align-items: flex-start; */
     overflow: auto;
+}
+
+.friends-list {
+    margin: 0 0 15px 0;
+    width: 100%;
 }
 
 .friends-list-body {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    margin-left: 50px;
-    border: 1px solid orangered;
+    margin-left: 30px;
+    /* border: 1px solid orangered; */
+}
+
+.friend button {
+    width: 30px;
 }
 
 .friend {
     width: 120px;
     height: 150px;
     border: 1px solid black;
-    margin: 5px;
-    padding: 10px;
+    margin: 5px 15px;
+    border-radius: 10px;
+    overflow: hidden;
+    /* padding: 5px; */
+    position: relative;
+}
+
+.friend-functions {
+    padding-top: 10px;
+    width: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #e8f1f5;
+    position: absolute;
+    z-index: 6;
+    bottom: -25px;
+    transition: transform 0.5s;
+}
+
+.friend-functions h2 {
+    cursor: pointer;
+    margin: 0 10px;
+}
+
+.friend-functions div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.friend-functions:hover {
+    transform: translateY(-25px);
+}
+
+.friend-img {
+    width: 120px;
+    height: 130px;
 }
 
 .friend-results {
@@ -492,20 +607,6 @@ label span {
 
 /* new stuff end */
 
-button {
-    margin: 10px 0;
-    position: relative;
-    /* background-color: tomato; */
-    font-weight: bold;
-    border-radius: 5px;
-    padding: 5px;
-    font-size: 1em;
-    width: 90%;
-    min-width: 150px;
-    height: 30px;
-    overflow: hidden;
-}
-
 .error-btn {
     color: red;
 }
@@ -519,8 +620,8 @@ button {
 }
 
 .profile-picture.small {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
 }
 
@@ -557,6 +658,8 @@ button {
     display: flex;
     flex-direction: row;
     border: 1px solid black;
+    background-color: #e8f1f5;
+    border-radius: 15px;
 }
 
 .user-frame {
@@ -564,13 +667,16 @@ button {
     height: 100%;
     display: flex;
     flex-direction: column;
-    border: 1px solid black;
+    /* border: 1px solid black; */
 }
 
 .user-header {
     width: 100%;
     height: 100px;
-    border: 1px solid black;
+    border-bottom: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .active-users {
@@ -589,10 +695,10 @@ button {
     /* width: 100%; */
     /* height: 100px; */
     /* border: 3px solid red; */
-    border-radius: 10px;
 }
 
 .selected {
+    border-radius: 10px;
     border: 7px solid green;
 }
 
@@ -629,11 +735,19 @@ button {
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
-    border: 2px solid blue;
+    /* border: 2px solid blue; */
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
+    background-color: #e8f1f5;
+}
+
+.messages h2 {
+    align-self: center;
+    margin: auto 0;
 }
 
 .message {
-    border: 1px solid black;
+    /* border: 1px solid black; */
     border-radius: 10px;
     margin-top: 5px;
     /* margin-left: 20px; */
@@ -643,6 +757,7 @@ button {
     flex-direction: row;
     flex-wrap: nowrap;
     height: 75px;
+    background-color: #005691;
     /* overflow: hidden; */
 }
 
@@ -687,7 +802,8 @@ button {
     border-radius: 50%;
 }
 
-.newMessage {
+.new-message {
+    padding: 10px 0 0 10px;
     width: 100%;
     height: 100%;
 }

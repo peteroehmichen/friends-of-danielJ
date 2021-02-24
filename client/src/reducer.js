@@ -1,3 +1,5 @@
+import { analyseMessages } from "./helpers";
+
 export default function reducer(store = {}, action) {
     if (action.type == "GET_ALL_RELATIONS") {
         store = {
@@ -178,6 +180,7 @@ export default function reducer(store = {}, action) {
             store.msgError = action.payload.error;
         } else {
             store.chat.push(action.payload);
+            store.chat = analyseMessages(store.chat);
             store.msgError = null;
         }
     }

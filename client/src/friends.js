@@ -45,13 +45,16 @@ export default function Friends(props) {
             friends = friends.map((elem) => (
                 <div className="friend" key={elem.id}>
                     <Link to={`/user/${elem.id}`}>
-                        <h3>
-                            {elem.first} {elem.last}
-                        </h3>
+                        <div className="friend-img">
+                            <img src={elem.profile_pic_url} />
+                        </div>
                     </Link>
-                    <button onClick={() => dispatch(unfriend(elem.id))}>
-                        cancel
-                    </button>
+                    <div className="friend-functions">
+                        <h3>
+                            {elem.first} {elem.last[0]}.
+                        </h3>
+                        <h2 onClick={() => dispatch(unfriend(elem.id))}>✘</h2>
+                    </div>
                 </div>
             ));
         }
@@ -59,35 +62,45 @@ export default function Friends(props) {
         requests = requests.map((elem) => (
             <div className="friend" key={elem.id}>
                 <Link to={`/user/${elem.id}`}>
-                    <h3>
-                        {elem.first} {elem.last}
-                    </h3>
+                    <div className="friend-img">
+                        <img src={elem.profile_pic_url} />
+                    </div>
                 </Link>
-                <button onClick={() => dispatch(acceptRequest(elem.id))}>
-                    accept
-                </button>
-                <button onClick={() => dispatch(denyRequest(elem.id))}>
-                    deny
-                </button>
+                <div className="friend-functions">
+                    <h3>
+                        {elem.first} {elem.last[0]}.
+                    </h3>
+                    <div>
+                        <h2 onClick={() => dispatch(acceptRequest(elem.id))}>
+                            ✓
+                        </h2>
+                        <h2 onClick={() => dispatch(denyRequest(elem.id))}>
+                            ✘
+                        </h2>
+                    </div>
+                </div>
             </div>
         ));
 
         pending = pending.map((elem) => (
             <div className="friend" key={elem.id}>
                 <Link to={`/user/${elem.id}`}>
-                    <h3>
-                        {elem.first} {elem.last}
-                    </h3>
+                    <div className="friend-img">
+                        <img src={elem.profile_pic_url} />
+                    </div>
                 </Link>
-                <button onClick={() => dispatch(cancelRequest(elem.id))}>
-                    cancel
-                </button>
+                <div className="friend-functions">
+                    <h3>
+                        {elem.first} {elem.last[0]}.
+                    </h3>
+                    <h2 onClick={() => dispatch(cancelRequest(elem.id))}>✘</h2>
+                </div>
             </div>
         ));
     }
 
     return (
-        <div className="main-view friends debug-green">
+        <div className="main-view friends">
             {error && (
                 <div className="friends-error">
                     <h2>{error}</h2>
@@ -103,7 +116,7 @@ export default function Friends(props) {
             )}
             {!error && (
                 <div className="friends-list">
-                    <h2>Your Friends</h2>
+                    <h1>Your Friends</h1>
                     <div className="friends-list-body">{friends}</div>
                 </div>
             )}

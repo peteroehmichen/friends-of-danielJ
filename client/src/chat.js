@@ -40,6 +40,12 @@ export default function Chat(props) {
             emitSingleMessage({ recipient: userPM, replyTo: reply, value });
             input.current.value = "";
             input.current.focus();
+            const oldAnswer = document.querySelector(".selectedAnswer");
+            if (oldAnswer) {
+                oldAnswer.classList.remove("selectedAnswer");
+            }
+            setReply("0");
+            setPlaceholder("");
         }
         setValue(null);
     };
@@ -62,11 +68,16 @@ export default function Chat(props) {
 
     const selectedUser = function (e) {
         const oldUser = document.querySelector(".selected");
+        const oldAnswer = document.querySelector(".selectedAnswer");
         if (oldUser) {
             oldUser.classList.remove("selected");
         }
+        if (oldAnswer) {
+            oldAnswer.classList.remove("selectedAnswer");
+        }
         e.currentTarget.classList.add("selected");
         // console.log(e.currentTarget);
+
         setUserPM(e.currentTarget.id);
     };
 
@@ -99,18 +110,16 @@ export default function Chat(props) {
                 <div className="chat-frame">
                     <div className="user-frame">
                         <div
-                            className="user-header"
+                            className="user-header selected"
                             id="0"
                             onClick={(e) => {
                                 // e.stopPropagation();
                                 // console.log(e);
-                                setPlaceholder(`Your Message...`);
+                                setPlaceholder("");
                                 selectedUser(e);
                             }}
                         >
-                            <h1 id="0" className="selected">
-                                ALL
-                            </h1>
+                            <h1>ALL</h1>
                         </div>
                         <div className="active-users">
                             {Array.isArray(activeUsers) &&
@@ -140,9 +149,7 @@ export default function Chat(props) {
                     <div className="chat-container">
                         <div ref={chatRef} className="messages">
                             {((!messages || messages.length == 0) && (
-                                <div className="messages">
-                                    <h5>So far no Messages</h5>
-                                </div>
+                                <h2>No Messages found</h2>
                             )) ||
                                 (Array.isArray(messages) &&
                                     messages.map((msg, i) => (
