@@ -28,9 +28,9 @@ export default function FindFriends(props) {
             } else if (data.empty) {
                 setMsg(data.empty);
             } else if (data.search) {
-                setMsg(`we found ${data.result.length} matches for you`);
+                setMsg(`We found ${data.result.length} matches for you`);
             } else {
-                setMsg(`displaying our ${data.result.length} newest users`);
+                setMsg(`These are our ${data.result.length} newest users`);
             }
         } catch (err) {
             setError("We encountered an unknown error");
@@ -42,7 +42,7 @@ export default function FindFriends(props) {
     }, [searchInput]);
 
     return (
-        <div className="main-view find-friends debug-green">
+        <div className="main-view find-friends">
             {error && (
                 <div className="friends-error">
                     <h2>{error}</h2>
@@ -55,11 +55,10 @@ export default function FindFriends(props) {
             )}
             {!error && (
                 <div>
-                    <h3>Find likeminded people</h3>
                     <input
                         type="text"
                         name="searchFriend"
-                        placeholder="Enter a name"
+                        placeholder="Search through our Users"
                         id="searchFriend"
                         key="searchFriend"
                         onChange={(e) => {
@@ -68,9 +67,10 @@ export default function FindFriends(props) {
                     />
                     <div className="friend-results">
                         <div className="friend-results-header">
-                            <h4>
-                                {msg}, {error}
-                            </h4>
+                            <h2>
+                                {msg}
+                                {error}
+                            </h2>
                         </div>
                         <div className="friend-results-body">
                             {friends.map((elem, index) => {
@@ -85,11 +85,11 @@ export default function FindFriends(props) {
                                     name.search(regex) + searchInput.length
                                 );
                                 name = (
-                                    <h2>
+                                    <h3>
                                         {one}
                                         <u>{tag}</u>
                                         {rest}
-                                    </h2>
+                                    </h3>
                                 );
 
                                 return (
@@ -113,11 +113,11 @@ export default function FindFriends(props) {
                                             <div className="friend-name">
                                                 {name}
                                             </div>
-                                            <div className="friend-functions">
-                                                <Link to={`/user/${elem.id}`}>
-                                                    View profile
-                                                </Link>
-                                            </div>
+                                        </div>
+                                        <div className="friend-function">
+                                            <Link to={`/user/${elem.id}`}>
+                                                <img src="/arrow.png" />
+                                            </Link>
                                         </div>
                                     </div>
                                 );

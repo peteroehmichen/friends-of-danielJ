@@ -22,7 +22,7 @@ export function App2() {
     const { user, activateUploadModal } = useSelector((store) => store);
     useEffect(() => {
         document.querySelector("main").style.backgroundImage = "none";
-        // dispatch(getUserData("0"));
+        dispatch(getUserData("0"));
     }, []);
 
     if (!user) return null;

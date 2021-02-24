@@ -121,7 +121,7 @@ export default function Uploader() {
             <div className="uploader">
                 <div className="uploader-head">
                     <div>
-                        <h2>Settings</h2>
+                        <h2>Personal Settings</h2>
                     </div>
                     <div
                         className="close"
@@ -139,7 +139,7 @@ export default function Uploader() {
                 >
                     {(user && (
                         <div className="pane one" ref={one}>
-                            <h2>stats and functions</h2>
+                            <h2>Account</h2>
                             <h3>
                                 {user.first} {user.last}
                             </h3>
@@ -188,7 +188,7 @@ export default function Uploader() {
                     </div>
                     <div
                         ref={slider}
-                        className="pane slider"
+                        className="slider"
                         onMouseDown={startDrag}
                     ></div>
                 </div>

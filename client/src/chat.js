@@ -159,7 +159,11 @@ export default function Chat(props) {
                                                     msg.indent * 30
                                                 }px`,
                                             }}
-                                            className="message"
+                                            className={
+                                                (msg.indent &&
+                                                    "message indent") ||
+                                                "message"
+                                            }
                                             key={i}
                                         >
                                             <div className="chat-image">
