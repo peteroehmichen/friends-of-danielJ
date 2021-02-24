@@ -100,12 +100,10 @@ export default function Uploader() {
         if (e.target.innerText == "Are you SURE?") {
             setLoading(true);
             setConfirm("deleting...");
-            // console.log("going to delete USER");
-            // FIXME user deletion
             const result = await axios.post("/api/deleteUser", {
                 url: user.profilePicUrl,
             });
-            // console.log("Deletion status:", result);
+            // TODO Check errors
             setLoading(false);
             location.replace("/logout");
         } else {

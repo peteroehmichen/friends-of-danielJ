@@ -23,7 +23,7 @@ export function App2() {
     const { user, activateUploadModal } = useSelector((store) => store);
     useEffect(() => {
         document.querySelector("main").style.backgroundImage = "none";
-        dispatch(getUserData("0"));
+        // dispatch(getUserData("0"));
     }, []);
 
     if (!user) return null;
@@ -89,8 +89,11 @@ export function App2() {
                 </div>
                 <div className="app-main">
                     {activateUploadModal && <Uploader />}
-                    <Route exact path="/" render={(props) => <Profile />} />
-                    <Route path="/chat" render={(props) => <Chat />} />
+                    <Route exact path="/" render={() => <Profile />} />
+                    <Route
+                        path="/chat"
+                        render={(props) => <Chat history={props.history} />}
+                    />
                     <Route
                         path="/friends"
                         render={(props) => <Friends history={props.history} />}

@@ -173,9 +173,11 @@ export async function receiveChatMessages(user) {
     const { data } = await axios.get(`api/chat.json?q=${user}`);
     // console.log("data from AXIOS CHAT:", data);
     // const msgs = data.reverse();
-    // console.log("got data:", data);
+    console.log("FIXME - sorted chat messages:", data);
     if (!data.error) {
-        const sorted = analyseMessages(data.reverse());
+        // FIXME analyse messages
+        // const sorted = analyseMessages(data.reverse());
+        const sorted = data.reverse();
         return {
             type: "RECEIVE_CHAT_MESSAGES",
             payload: sorted,
@@ -183,13 +185,13 @@ export async function receiveChatMessages(user) {
     } else {
         return {
             type: "RECEIVE_CHAT_MESSAGES",
-            payload: data.error,
+            error: data.error,
         };
     }
 }
 
 export function newChatMessage(obj) {
-    console.log("Got a new chat msg:", obj);
+    // console.log("Got a new chat msg:", obj);
     return {
         type: "NEW_CHAT_MESSAGE",
         payload: obj,

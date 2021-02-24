@@ -12,60 +12,63 @@ export function BioEditor2() {
     const [value, setValue] = useState("");
     const [loading, setLoading] = useState(false);
 
-    if (!user.bio) return null;
+    if (!user) return null;
 
-    if (value == "") {
-        setValue(user.bio);
-    }
-    const buttonText = user.bio ? "edit Bio" : "add Bio";
     const off = (
         <div>
             <p>{user.bio}</p>
             <button
+                className={(user.bioError && "error-btn") || " "}
+                disabled={user.bioError}
                 onClick={() => {
+                    setValue(user.bio);
                     dispatch(toggleBioEditor());
                 }}
             >
-                {buttonText}
+                {(user.bioError && user.bioError) ||
+                    (user.bio ? "edit Bio" : "add Bio")}
             </button>
         </div>
     );
-    const waitButton = loading ? (
-        <button disabled={true}>
-            <Spinner />
-        </button>
-    ) : (
-        <button
-            className={(user.bioError && "error-btn") || " "}
-            onClick={async () => {
-                setLoading(true);
-                await dispatch(updateBio(value));
-                setLoading(false);
-                if (!user.bioError) {
-                    dispatch(toggleBioEditor());
-                }
-            }}
-            disabled={user.bioError}
-        >
-            {user.bioError ? user.bioError : "Save Bio"}
-        </button>
-    );
-    let on = (
+    const on = (
         <div>
             <textarea
-                defaultValue={value}
+                placeholder="Tell us a bit about you..."
+                defaultValue={user.bio}
                 onChange={(e) => setValue(e.target.value)}
             />
-            {waitButton}
+            <div className="bioBtns">
+                <div>
+                    <button
+                        onClick={() => {
+                            dispatch(toggleBioEditor());
+                        }}
+                    >
+                        cancel
+                    </button>
+                </div>
+                <div>
+                    {(loading && (
+                        <button disabled={true}>
+                            <Spinner />
+                        </button>
+                    )) || (
+                        <button
+                            onClick={async () => {
+                                setLoading(true);
+                                await dispatch(updateBio(value));
+                                dispatch(toggleBioEditor());
+                                setLoading(false);
+                            }}
+                        >
+                            Save Bio
+                        </button>
+                    )}
+                </div>
+            </div>
         </div>
     );
-    // FIXME Error is not read immediately and stops reload!
-    return (
-        <div className="bio">
-            {(activeBioEditor && on) || off}
-            <p>Error: {user.bioError}</p>
-        </div>
-    );
+    return <div className="bio">{activeBioEditor ? on : off}</div>;
 }
 
 // export default class BioEditor extends React.Component {

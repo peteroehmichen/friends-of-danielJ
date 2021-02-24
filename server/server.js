@@ -300,8 +300,6 @@ app.post(
     "/api/user/profile-pic.json",
     uploader.single("file"),
     async (req, res) => {
-        // console.log("req.body:", req.body.old);
-        // console.log("req.old:", req.old);
         try {
             const awsAdd = await uploadToAWS(req);
             const awsDelete = await deleteFromAWS(req.body.old);
@@ -335,7 +333,6 @@ app.post("/api/profile-bio.json", async (req, res) => {
 
 app.get("/api/chat.json", async (req, res) => {
     // console.log("requested chat", req.query);
-    // TODO filter messages for access
     id = req.session.userId;
     try {
         const { rows } = await db.getLastChats(req.session.userId, req.query.q);
@@ -387,13 +384,13 @@ io.on("connection", async (socket) => {
     activeSockets[socket.id] = socket.request.session.userId;
     // console.log("Change in Socket-Conenctions");
     // console.log(activeSockets);
-    // const users = activeUsers(activeSockets);
-    // console.log("xxx:", users);
-    io.emit("activeUsers", await activeUsers(activeSockets));
+    const users = await activeUsers(activeSockets);
+    // console.log("active users for client:", users);
+    io.emit("activeUsers", users);
     // activeUsers(activeSockets);
 
     socket.on("newMessage", async (msg) => {
-        console.log("message:", msg);
+        // console.log("message:", msg);
         let status;
         try {
             const result = await db.addNewMessage(

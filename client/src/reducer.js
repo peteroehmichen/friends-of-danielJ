@@ -65,6 +65,7 @@ export default function reducer(store = {}, action) {
         }
         if (action.id == "0") {
             store.user = action.payload;
+            store.activeBioEditor = false;
         } else {
             store.otherUser = {
                 ...store.otherUser,
@@ -156,6 +157,7 @@ export default function reducer(store = {}, action) {
             otherUser: {
                 ...store.otherUser,
             },
+            chatError: action.error,
             chat: action.payload || [],
         };
     }
@@ -173,10 +175,10 @@ export default function reducer(store = {}, action) {
             chat: [...store.chat],
         };
         if (action.payload.error) {
-            store.chatError = action.payload.error;
+            store.msgError = action.payload.error;
         } else {
             store.chat.push(action.payload);
-            store.chatError = null;
+            store.msgError = null;
         }
     }
 

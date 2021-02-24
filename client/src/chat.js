@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { receiveChatMessages } from "./action";
+import Countdown from "./countdown";
 import { format_time } from "./helpers";
 import { emitSingleMessage } from "./socket";
 
-export default function Chat() {
+// FIXME sorting of messages
+
+export default function Chat(props) {
     const chatRef = useRef(null);
     const input = useRef(null);
     const [value, setValue] = useState("");
@@ -13,30 +16,34 @@ export default function Chat() {
     const [placeholder, setPlaceholder] = useState("");
     const dispatch = useDispatch();
     let messages = useSelector((store) => store.chat);
-    const error = useSelector((store) => store.chatError);
+    const chatError = useSelector((store) => store.chatError);
+    const msgError = useSelector((store) => store.msgError);
     const activeUsers = useSelector((store) => store.activeUsers || []);
 
     useEffect(() => {
+        // console.log("receiving chat messages...");
         dispatch(receiveChatMessages(userPM));
     }, [userPM]);
 
     useEffect(() => {
-        if (messages) {
+        // console.log("scrolling to bottom");
+        if (messages && chatRef.current) {
             chatRef.current.scrollTop =
                 chatRef.current.scrollHeight - chatRef.current.clientHeight;
         }
     }, [messages]);
 
     const submit = function (e) {
-        setValue(null);
         // console.log(e);
         if (e.key === "Enter" || e.type == "click") {
+            e.preventDefault();
             emitSingleMessage({ recipient: userPM, replyTo: reply, value });
             input.current.value = "";
             input.current.focus();
         }
+        setValue(null);
     };
-    // console.log(activeUsers);
+    // console.log("active Users:", activeUsers);
 
     const selectReply = function (e) {
         if (e.target.classList.contains("selectedAnswer")) {
@@ -58,11 +65,13 @@ export default function Chat() {
         if (oldUser) {
             oldUser.classList.remove("selected");
         }
-        e.target.classList.add("selected");
-        setUserPM(e.target.id);
+        e.currentTarget.classList.add("selected");
+        // console.log(e.currentTarget);
+        setUserPM(e.currentTarget.id);
     };
 
-    if (messages) {
+    if (Array.isArray(messages)) {
+        // console.log("type of messages:", Array.isArray(messages));
         messages = messages.filter((message) => {
             if (userPM == 0) {
                 return !message.private;
@@ -74,119 +83,136 @@ export default function Chat() {
 
     return (
         <div className="chat">
-            <div className="chat-frame">
-                <div className="user-frame">
-                    <div
-                        className="user-header"
-                        id="0"
-                        onClick={(e) => {
-                            // e.stopPropagation();
-                            // console.log(e);
-                            setPlaceholder(`Your Message...`);
-                            selectedUser(e);
-                        }}
-                    >
-                        <h1 id="0" className="selected">
-                            ALL
-                        </h1>
-                    </div>
-                    <div className="active-users">
-                        {activeUsers &&
-                            activeUsers.map((user) => (
-                                <div
-                                    key={user.id}
-                                    id={user.id}
-                                    className="active-user"
-                                    onClick={(e) => {
-                                        setPlaceholder(
-                                            `Your Message to ${user.first}...`
-                                        );
-
-                                        selectedUser(e);
-                                    }}
-                                >
-                                    <div id={user.id} className="active-thumb">
-                                        <img
-                                            id={user.id}
-                                            src={user.profile_pic_url}
-                                        />
-                                    </div>
-                                    <div id={user.id} className="active-name">
-                                        <b id={user.id}>{user.first}</b>
-                                    </div>
-                                </div>
-                            ))}
-                    </div>
-                </div>
-                <div className="chat-container">
-                    <div ref={chatRef} className="messages">
-                        {((!messages || messages.length == 0) && (
-                            <div className="messages">
-                                <h5>So far no Messages</h5>
-                            </div>
-                        )) ||
-                            (messages &&
-                                messages.map((msg, i) => (
-                                    <div
-                                        style={{
-                                            marginLeft: `${msg.indent * 20}px`,
-                                        }}
-                                        className="message"
-                                        key={i}
-                                    >
-                                        <div className="chat-image">
-                                            <img src={msg.profile_pic_url} />
-                                        </div>
-                                        <div className="chat-right">
-                                            <div
-                                                className="reply"
-                                                id={msg.id}
-                                                onClick={(e) => {
-                                                    setPlaceholder(
-                                                        `Your Answer to ${msg.first}...`
-                                                    );
-                                                    selectReply(e);
-                                                }}
-                                            >
-                                                ↩
-                                            </div>
-                                            <div className="chat-head">
-                                                <p>
-                                                    <b>
-                                                        {msg.first} {msg.last}
-                                                    </b>
-                                                    ,{" "}
-                                                    {format_time(
-                                                        msg.created_at
-                                                    )}
-                                                </p>
-                                            </div>
-                                            <div className="chat-body">
-                                                <p>{msg.text}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )))}
-                    </div>
-                    <div className="new-message">
-                        <textarea
-                            placeholder={placeholder || "Your Message..."}
-                            onChange={(e) => setValue(e.target.value)}
-                            onKeyPress={(e) => submit(e)}
-                            ref={input}
-                            className="chat-input"
+            {(chatError && (
+                <div className="friends-error">
+                    <h2>{chatError}</h2>
+                    <h4>
+                        Automatically redirecting you to Start-Page in
+                        <Countdown
+                            deadline={Date.now() + 5000}
+                            actionOnEnd={() => props.history.push("/")}
                         />
-                        <button
-                            disabled={!value}
+                        seconds
+                    </h4>
+                </div>
+            )) || (
+                <div className="chat-frame">
+                    <div className="user-frame">
+                        <div
+                            className="user-header"
+                            id="0"
                             onClick={(e) => {
-                                submit(e);
+                                // e.stopPropagation();
+                                // console.log(e);
+                                setPlaceholder(`Your Message...`);
+                                selectedUser(e);
                             }}
                         >
-                            {(error && error) || "Publish Message"}
-                        </button>
+                            <h1 id="0" className="selected">
+                                ALL
+                            </h1>
+                        </div>
+                        <div className="active-users">
+                            {Array.isArray(activeUsers) &&
+                                activeUsers.map((user) => (
+                                    <div
+                                        key={user.id}
+                                        id={user.id}
+                                        className="active-user"
+                                        onClick={(e) => {
+                                            setPlaceholder(
+                                                `Your Message to ${user.first}...`
+                                            );
+
+                                            selectedUser(e);
+                                        }}
+                                    >
+                                        <div className="active-thumb">
+                                            <img src={user.profile_pic_url} />
+                                        </div>
+                                        <div className="active-name">
+                                            <b>{user.first}</b>
+                                        </div>
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
+                    <div className="chat-container">
+                        <div ref={chatRef} className="messages">
+                            {((!messages || messages.length == 0) && (
+                                <div className="messages">
+                                    <h5>So far no Messages</h5>
+                                </div>
+                            )) ||
+                                (Array.isArray(messages) &&
+                                    messages.map((msg, i) => (
+                                        <div
+                                            style={{
+                                                marginLeft: `${
+                                                    msg.indent * 30
+                                                }px`,
+                                            }}
+                                            className="message"
+                                            key={i}
+                                        >
+                                            <div className="chat-image">
+                                                <img
+                                                    src={msg.profile_pic_url}
+                                                />
+                                            </div>
+                                            <div className="chat-right">
+                                                <div
+                                                    className="reply"
+                                                    id={msg.id}
+                                                    onClick={(e) => {
+                                                        setPlaceholder(
+                                                            `Your Answer to ${msg.first}...`
+                                                        );
+                                                        selectReply(e);
+                                                    }}
+                                                >
+                                                    ↩
+                                                </div>
+                                                <div className="chat-head">
+                                                    <p>
+                                                        <b>
+                                                            {msg.first}{" "}
+                                                            {msg.last}
+                                                        </b>
+                                                        ,{" "}
+                                                        {format_time(
+                                                            msg.created_at
+                                                        )}
+                                                    </p>
+                                                </div>
+                                                <div className="chat-body">
+                                                    <p>{msg.text}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )))}
+                        </div>
+                        <div className="new-message">
+                            <textarea
+                                placeholder={placeholder || "Your Message..."}
+                                onChange={(e) => setValue(e.target.value)}
+                                onKeyPress={(e) => submit(e)}
+                                ref={input}
+                                className="chat-input"
+                            />
+                            <button
+                                className={(msgError && "error-btn") || " "}
+                                disabled={!value}
+                                onClick={(e) => {
+                                    submit(e);
+                                }}
+                            >
+                                {(msgError && msgError) || "Publish Message"}
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }
