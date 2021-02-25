@@ -76,7 +76,7 @@ export function OtherProfile2(props) {
             } else {
                 setFirst(data.first);
                 setLast(data.last);
-                setProfilePicUrl(data.profilePicUrl || "/default_user.svg");
+                setProfilePicUrl(data.profilePicUrl || "/default.jpg");
                 setBio(data.bio);
                 setError(false);
             }
@@ -146,7 +146,7 @@ export default class OtherProfile extends React.Component {
                 this.setState({
                     first: data.first,
                     last: data.last,
-                    profilePicUrl: data.profilePicUrl || "/default_user.svg",
+                    profilePicUrl: data.profilePicUrl || "/default.jpg",
                     bio: data.bio,
                     error: false,
                 });

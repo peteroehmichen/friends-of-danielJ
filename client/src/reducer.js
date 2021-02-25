@@ -63,7 +63,7 @@ export default function reducer(store = {}, action) {
             },
         };
         if (!action.payload.profilePicUrl) {
-            action.payload.profilePicUrl = "/default_user.svg";
+            action.payload.profilePicUrl = "/default.jpg";
         }
         if (action.id == "0") {
             store.user = action.payload;

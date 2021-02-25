@@ -1,5 +1,5 @@
 import { HashRouter, Route } from "react-router-dom";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import Registration from "./registration";
 import Login from "./login";
 import PasswordReset from "./passwordReset";
@@ -8,7 +8,11 @@ import Logo from "./logo";
 // sole purpose is to create the pane for registration component
 
 // called "dumb" or "presentational" components (because they dont have much functionaility. - "Pre-hooks")
-export default function Welcome(props) {
+export default function Welcome() {
+    useEffect(() => {
+        document.querySelector("main").style.backgroundImage =
+            "url('bg_intro.jpg')";
+    }, []);
     return (
         <Fragment>
             <div className="welcome">

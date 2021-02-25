@@ -29,7 +29,7 @@ export function App2() {
 
     return (
         <BrowserRouter>
-            <div className="app-frame debug-black">
+            <div className="app-frame">
                 {user.error && (
                     <div className="overlay">
                         <div className="uploader">
@@ -157,7 +157,7 @@ export default class App extends React.Component {
                 first: result.data.first,
                 last: result.data.last,
                 bio: result.data.bio,
-                profilePicUrl: result.data.profilePicUrl || "/default_user.svg",
+                profilePicUrl: result.data.profilePicUrl || "/default.jpg",
                 total: result.data.total,
                 userSince: result.data.created_at,
                 error: result.data.error,

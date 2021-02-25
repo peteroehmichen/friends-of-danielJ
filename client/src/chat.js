@@ -93,7 +93,7 @@ export default function Chat(props) {
     }
 
     return (
-        <div className="chat">
+        <div className="main-view chat">
             {(chatError && (
                 <div className="friends-error">
                     <h2>{chatError}</h2>

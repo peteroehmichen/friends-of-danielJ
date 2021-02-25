@@ -15,7 +15,7 @@ export default function FindFriends(props) {
             const { data } = await axios.get(
                 `/api/findUsers.json?search=${searchInput}`
             );
-            console.log("data:", data);
+            // console.log("data:", data);
             if (!data.result) {
                 data.result = [];
             }
@@ -54,7 +54,7 @@ export default function FindFriends(props) {
                 </div>
             )}
             {!error && (
-                <div>
+                <div className="friends-input">
                     <input
                         type="text"
                         name="searchFriend"
@@ -65,64 +65,62 @@ export default function FindFriends(props) {
                             setSearchInput(e.target.value);
                         }}
                     />
+                    <div className="friend-results-header">
+                        <h2>
+                            {msg}
+                            {error}
+                        </h2>
+                    </div>
                     <div className="friend-results">
-                        <div className="friend-results-header">
-                            <h2>
-                                {msg}
-                                {error}
-                            </h2>
-                        </div>
-                        <div className="friend-results-body">
-                            {friends.map((elem, index) => {
-                                let name = elem.first + " " + elem.last;
-                                const regex = new RegExp(searchInput, "gi");
-                                const one = name.slice(0, name.search(regex));
-                                const tag = name.substr(
-                                    name.search(regex),
-                                    searchInput.length
-                                );
-                                const rest = name.slice(
-                                    name.search(regex) + searchInput.length
-                                );
-                                name = (
-                                    <h3>
-                                        {one}
-                                        <u>{tag}</u>
-                                        {rest}
-                                    </h3>
-                                );
+                        {friends.map((elem, index) => {
+                            let name = elem.first + " " + elem.last;
+                            const regex = new RegExp(searchInput, "gi");
+                            const one = name.slice(0, name.search(regex));
+                            const tag = name.substr(
+                                name.search(regex),
+                                searchInput.length
+                            );
+                            const rest = name.slice(
+                                name.search(regex) + searchInput.length
+                            );
+                            name = (
+                                <h3>
+                                    {one}
+                                    <u>{tag}</u>
+                                    {rest}
+                                </h3>
+                            );
 
-                                return (
-                                    <div key={index} className="found-friend">
-                                        <div className="friend-pic-small">
-                                            <img
-                                                src={
-                                                    elem.profile_pic_url ||
-                                                    "/default_user.svg"
-                                                }
-                                                alt="thumbnail"
-                                                onError={(e) => {
-                                                    e.target.setAttribute(
-                                                        "src",
-                                                        "/default_user.svg"
-                                                    );
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="friend-summary">
-                                            <div className="friend-name">
-                                                {name}
-                                            </div>
-                                        </div>
-                                        <div className="friend-function">
-                                            <Link to={`/user/${elem.id}`}>
-                                                <img src="/arrow.png" />
-                                            </Link>
+                            return (
+                                <div key={index} className="found-friend">
+                                    <div className="friend-pic-small">
+                                        <img
+                                            src={
+                                                elem.profile_pic_url ||
+                                                "/default.jpg"
+                                            }
+                                            alt="thumbnail"
+                                            onError={(e) => {
+                                                e.target.setAttribute(
+                                                    "src",
+                                                    "/default.jpg"
+                                                );
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="friend-summary">
+                                        <div className="friend-name">
+                                            {name}
                                         </div>
                                     </div>
-                                );
-                            })}
-                        </div>
+                                    <div className="friend-function">
+                                        <Link to={`/user/${elem.id}`}>
+                                            <img src="/arrow.png" />
+                                        </Link>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             )}

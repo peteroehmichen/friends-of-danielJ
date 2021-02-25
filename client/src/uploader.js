@@ -72,7 +72,7 @@ export default function Uploader() {
 
     function shiftPane(evt) {
         evt.preventDefault();
-        console.log("mouseMOVE");
+        // console.log("mouseMOVE");
         if (evt.clientY >= minY && evt.clientY <= maxY) {
             const newPosition = evt.clientY - minY;
             one.current.style.height = newPosition + "px";
@@ -82,7 +82,7 @@ export default function Uploader() {
     // FIXME still buggy sliding
     function startDrag(e) {
         e.preventDefault();
-        console.log("mouseDOWN:");
+        // console.log("mouseDOWN:");
         minY = e.clientY - e.target.offsetTop;
         maxY = minY + container.current.offsetHeight;
         container.current.addEventListener("mousemove", shiftPane);
@@ -90,13 +90,13 @@ export default function Uploader() {
 
     function stopDrag(evt) {
         // evt.preventDefault();
-        console.log("mouseUP");
+        // console.log("mouseUP");
         container.current.removeEventListener("mousemove", shiftPane);
     }
 
     async function deleteAccount(e) {
         e.preventDefault();
-        console.log("clicked with", e.target.innerText);
+        // console.log("clicked with", e.target.innerText);
         if (e.target.innerText == "Are you SURE?") {
             setLoading(true);
             setConfirm("deleting...");
@@ -184,7 +184,6 @@ export default function Uploader() {
                                 "Upload Picture"
                             )}
                         </button>
-                        <img className="upload-image" src="/On_the_rock.jpg" />
                     </div>
                     <div
                         ref={slider}

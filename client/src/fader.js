@@ -1,5 +1,36 @@
+import { useState } from "react";
+
 export default function Fader() {
-    return <h1>Test</h1>;
+    const [element, setElement] = useState(0);
+    const pictures = [
+        "blasted.jpg",
+        "texas.jpg",
+        "punching.jpg",
+        "america.jpg",
+        "devil.jpg",
+        "fear.jpg",
+        "finish.jpg",
+        "future.jpg",
+        "head.jpg",
+        "hi.jpg",
+        "micro.jpg",
+        "remember.jpg",
+        "road.jpg",
+        "teacher.jpg",
+        "torso.jpg",
+    ];
+
+    const newIMG = function () {
+        // console.log(Math.floor(Math.random() * pictures.length));
+        setElement(Math.floor(Math.random() * pictures.length));
+        // setElement((prev) => (prev == pictures.length - 1 ? 0 : prev + 1));
+    };
+
+    return (
+        <div className="fader-image">
+            <img src={`/gallery/${pictures[element]}`} onClick={newIMG} />
+        </div>
+    );
 }
 
 // export default function Fader() {
